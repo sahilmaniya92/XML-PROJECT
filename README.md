@@ -37,7 +37,8 @@ Data saves in **browser localStorage**. Sign in to sync one JSON row to **Supaba
 | Kelvin Idoko | [README-KELVIN.md](./README-KELVIN.md) |
 
 **Progress tracker:** [project_progress_tracker.md](./project_progress_tracker.md)  
-**User stories:** [user_stories.md](./user_stories.md)
+**User stories:** [user_stories.md](./user_stories.md)  
+**Timeline:** [mosco_timeline.md](./mosco_timeline.md) (June → August 2026)
 
 ## One demo per person
 
