@@ -33,7 +33,7 @@ Last updated: July 7, 2026
 | **Kelvin Idoko** | N01777723 | 6 | Weekly study planner | 🟡 **Partial** |
 | **Sahil Maniya** | N01769967 | 8 | One-click exam prep | 🟡 **Partial** |
 | **Sahil Maniya** | N01769967 | 9 | Study analytics | 🟡 **Partial** |
-| **Sahil Maniya** | N01769967 | 4 | AI answers from notes | ⬜ **Placeholder** |
+| **ALL** |  | 4 | AI answers from notes | ⬜ **Placeholder** |
 
 ---
 
