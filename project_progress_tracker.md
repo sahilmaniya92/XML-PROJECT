@@ -141,12 +141,7 @@ Last updated: July 7, 2026
 - Data: `localStorage` + optional Supabase (`workspaces` table, JSON `data` column)
 - No external AI API connected yet (Epic 4 — team task)
 
----
-
-## What to tell the professor
-
-> "We mapped **9 epics** to the app. **4 user stories are demo-ready** (Today dashboard, linked notes, Kanban assignments, and exam/flashcard flow). **Epic 4 AI** has the UI shell in the sidebar — the whole team will wire Gemini + note search together. The rest are working prototypes with simple vanilla JS."
-
+ 
 ---
 
 ## Next steps (suggested)
