@@ -36,7 +36,8 @@ Data saves in **browser localStorage**. Sign in to sync one JSON row to **Supaba
 | Parth Patel | [README-PARTH.md](./README-PARTH.md) |
 | Kelvin Idoko | [README-KELVIN.md](./README-KELVIN.md) |
 
-**Progress tracker:** [project_progress_tracker.md](./project_progress_tracker.md)
+**Progress tracker:** [project_progress_tracker.md](./project_progress_tracker.md)  
+**User stories:** [user_stories.md](./user_stories.md)
 
 ## One demo per person
 
