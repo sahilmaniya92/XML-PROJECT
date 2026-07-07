@@ -81,8 +81,64 @@ export function attachBlockBehavior(contentEl, { onPersist }) {
       wrapBlocks(contentEl)
       focusBlock(newBlock.querySelector('.editor-block') ?? newBlock)
       onPersist()
+      return
+    }
+
+    if (handle) {
+      showBlockMenu(handle, outer, contentEl, onPersist)
     }
   })
+}
+
+function showBlockMenu(anchor, outer, contentEl, onPersist) {
+  document.querySelector('.block-context-menu')?.remove()
+
+  const menu = document.createElement('div')
+  menu.className = 'block-context-menu'
+  menu.innerHTML = `
+    <button type="button" data-block-action="up">↑ Move up</button>
+    <button type="button" data-block-action="down">↓ Move down</button>
+    <button type="button" data-block-action="delete" class="is-danger">Delete block</button>
+  `
+
+  const rect = anchor.getBoundingClientRect()
+  menu.style.top = `${rect.bottom + 4}px`
+  menu.style.left = `${rect.left}px`
+  document.body.appendChild(menu)
+
+  const close = () => menu.remove()
+
+  menu.querySelector('[data-block-action="up"]')?.addEventListener('click', () => {
+    const prev = outer.previousElementSibling
+    if (prev) {
+      contentEl.insertBefore(outer, prev)
+      onPersist()
+    }
+    close()
+  })
+
+  menu.querySelector('[data-block-action="down"]')?.addEventListener('click', () => {
+    const next = outer.nextElementSibling
+    if (next) {
+      contentEl.insertBefore(next, outer)
+      onPersist()
+    }
+    close()
+  })
+
+  menu.querySelector('[data-block-action="delete"]')?.addEventListener('click', () => {
+    outer.remove()
+    if (!contentEl.querySelector('.block-outer')) {
+      contentEl.appendChild(createTextBlock())
+      wrapBlocks(contentEl)
+    }
+    onPersist()
+    close()
+  })
+
+  setTimeout(() => {
+    document.addEventListener('click', close, { once: true })
+  }, 0)
 }
 
 export function wrapBlocks(contentEl) {

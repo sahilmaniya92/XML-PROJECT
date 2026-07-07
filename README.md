@@ -28,15 +28,41 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 | `npm run build` | Production build to `dist/` |
 | `npm run preview` | Preview the production build |
 
+### Supabase setup (optional — enables cloud sync & auth)
+
+1. Create a project at [supabase.com](https://supabase.com)
+2. Copy the env template and add your API keys:
+
+```bash
+cp .env.example .env
+```
+
+3. In Supabase Dashboard → **Connect** or **Project Settings → API**, copy:
+   - **Project URL**
+   - **Publishable key** (`sb_publishable_...`)
+
+4. Add them to `.env` (use `VITE_` prefix for Vite, not `NEXT_PUBLIC_`):
+
+```env
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_your-key-here
+```
+
+5. Restart the dev server: `npm run dev`
+6. Click **Sign in** in the sidebar to create an account and sync data
+
+> Without `.env`, the app still works locally — data saves to your browser via `localStorage`.
+
 ---
 
 ## Project Structure
 
 ```
-MY PROJECT/
+XML-PROJECT/
 ├── index.html              # HTML entry point
 ├── main.js                 # App bootstrap & render orchestration
 ├── vite.config.js          # Vite + Tailwind configuration
+├── .env.example            # Supabase API key template
 ├── package.json
 ├── components/
 │   ├── sidebar.js          # Left sidebar (pages, search, nav)
@@ -55,6 +81,8 @@ MY PROJECT/
     ├── db.js               # Cloud CRUD + realtime subscriptions
     ├── state.js            # Central app state & page CRUD
     ├── persistence.js      # localStorage save/load
+    ├── supabase.js         # Supabase client (env config)
+    ├── supabaseSync.js     # Cloud sync for pages, events, settings
     ├── slashMenu.js        # "/" block command menu
     ├── blockEditor.js      # Block handles, Enter/Backspace logic
     ├── covers.js           # Page cover gradients
@@ -74,6 +102,16 @@ MY PROJECT/
 - **CodeFusion AI** — side panel with quick actions (Gemini API planned)
 - **Demo mode** — works offline with localStorage when Supabase is not configured
 - **Responsive** — mobile sidebar drawer, adaptive layout
+
+### Interactive UI actions
+
+| Area | Actions |
+|------|---------|
+| Sidebar | Search pages, open Home/Calendar, Inbox, Templates, Trash, Sign in, favorite/delete pages |
+| Editor | Edit title & blocks, `/` slash menu, toggle to-dos, change icon/cover |
+| Top bar | Toggle sidebar, share page, CodeFusion, sync status pill, favorites |
+| Calendar | Navigate months, select dates, add events via modal, delete events |
+| Modals | Auth, share link copy, template picker, trash restore, inbox navigation |
 
 ---
 
@@ -157,7 +195,7 @@ You will see the login screen. Create an account or log in — your workspace sy
 
 ---
 
-### 4. Parth Patel — Block Editor, Styling & Documentation
+### 4. Parth Patel — Block Editor, Styling, Supabase & Documentation
 
 | Task | Details |
 |------|---------|
@@ -168,9 +206,11 @@ You will see the login screen. Create an account or log in — your workspace sy
 | Content serialization | Convert between HTML blocks and plain-text storage format in `blockEditor.js` |
 | Notion-style design | Colors (`#f7f6f3` sidebar, `#37352f` text), typography, spacing, hover states in `styles.css` |
 | Cover gradients | `utils/covers.js` with 9 gradient presets |
+| Supabase integration | Client setup, auth modal, cloud sync for pages/events/settings via API keys |
+| Interactive modals | Share, templates, trash, inbox, calendar event forms |
 | README | Project documentation, team division, and problem log |
 
-**Files:** `components/editor.js`, `utils/slashMenu.js`, `utils/blockEditor.js`, `utils/covers.js`, `styles/styles.css`, `README.md`
+**Files:** `components/editor.js`, `components/auth.js`, `components/modal.js`, `utils/slashMenu.js`, `utils/blockEditor.js`, `utils/covers.js`, `utils/supabase.js`, `utils/supabaseSync.js`, `styles/styles.css`, `.env.example`, `README.md`
 
 ---
 
@@ -262,6 +302,19 @@ You will see the login screen. Create an account or log in — your workspace sy
 - For development, always use `npm run dev` (Vite dev server with hot reload) instead of serving `dist/` manually.
 
 **Lesson:** `dist/` is a snapshot — it only updates when you run `npm run build`.
+
+---
+
+### Problem 8: Supabase env vars not loading in Vite
+
+**What happened:** Pasting `NEXT_PUBLIC_SUPABASE_URL` from the Supabase Connect screen did not work — the app still showed "Supabase not configured".
+
+**How we solved it:**
+- Vite requires the `VITE_` prefix for client-side env vars (not `NEXT_PUBLIC_`, which is Next.js only).
+- Created `.env.example` with `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.
+- Restarted the dev server after creating `.env` so Vite picks up the new values.
+
+**Lesson:** Match env variable prefixes to your build tool — `VITE_` for Vite, `NEXT_PUBLIC_` for Next.js.
 
 ---
 

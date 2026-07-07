@@ -83,6 +83,14 @@ export function renderSidebar(container, {
           <span class="sidebar-workspace-name">${escapeHtml(getUserDisplayName())}'s Space</span>
           ${syncLabel ? `<span class="sidebar-sync-badge sync-${syncStatus}">${syncLabel}</span>` : ''}
         </button>
+        <div class="app-dropdown-menu" data-dropdown-menu>
+          <button type="button" class="app-dropdown-item" data-dropdown-action="home">🏠 Home</button>
+          <button type="button" class="app-dropdown-item" data-dropdown-action="new-page">📄 New page</button>
+          <button type="button" class="app-dropdown-item" data-dropdown-action="templates">📋 Templates</button>
+          <button type="button" class="app-dropdown-item" data-dropdown-action="calendar">📅 Calendar Plus</button>
+          <button type="button" class="app-dropdown-item" data-dropdown-action="trash">🗑️ Trash</button>
+          <button type="button" class="app-dropdown-item" data-dropdown-action="auth">${user ? '👤 Account' : '🔐 Sign in'}</button>
+        </div>
       </div>
 
       <div class="sidebar-search-wrap">
@@ -112,6 +120,10 @@ export function renderSidebar(container, {
       </div>
 
       <div class="sidebar-footer">
+        <button type="button" class="sidebar-auth-btn" data-action="auth">
+          <span class="sidebar-auth-avatar">${user ? user.email?.[0]?.toUpperCase() ?? 'U' : '👤'}</span>
+          <span class="sidebar-auth-label">${user ? 'Account' : 'Sign in'}</span>
+        </button>
         <button type="button" class="sidebar-new-page" data-action="new-page">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sidebar-nav-icon"><path d="M12 5v14M5 12h14"/></svg>
           <span>New page</span>
@@ -160,6 +172,24 @@ export function renderSidebar(container, {
       e.stopPropagation()
       onDeletePage(btn.dataset.deleteId)
     })
+  })
+
+  container.querySelector('[data-action="toggle-section"]')?.addEventListener('click', onTogglePrivateSection)
+
+  bindDropdown(container, {
+    toggleSelector: '[data-dropdown-toggle]',
+    menuSelector: '[data-dropdown-menu]',
+    onSelect: (action) => {
+      const actions = {
+        home: onOpenHome,
+        'new-page': () => onNewPage(false),
+        templates: onOpenTemplates,
+        calendar: onOpenCalendarPlus,
+        trash: onOpenTrash,
+        auth: onOpenAuth,
+      }
+      actions[action]?.()
+    },
   })
 
   container.querySelector('[data-action="calendar-plus"]')?.addEventListener('click', onOpenCalendarPlus)

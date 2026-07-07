@@ -15,6 +15,17 @@ export function renderTopbar(container, {
   onNavigatePage,
   onCreateSubPage,
   onSave,
+  onShare,
+  onOpenAuth,
+  onOpenHome,
+  onDuplicatePage,
+  onDeletePage,
+  onOpenTrash,
+  onOpenCalendarPlus,
+  onCopyContent,
+  onRemoveCover,
+  onNewPage,
+  onShowShortcuts,
 }) {
   const isHome = activeView === 'home'
   const ancestors = !isHome && activePage ? getPageAncestors(activePage.id) : []
@@ -42,6 +53,17 @@ export function renderTopbar(container, {
         : syncStatus === 'error'
           ? '<span class="topbar-sync error">●</span>'
           : ''
+
+  const syncLabel =
+    syncStatus === 'syncing'
+      ? 'Syncing…'
+      : syncStatus === 'synced'
+        ? 'Synced'
+        : syncStatus === 'error'
+          ? 'Sync error'
+          : user
+            ? 'Cloud'
+            : 'Local'
 
   container.innerHTML = `
     <div class="topbar">

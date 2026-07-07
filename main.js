@@ -11,6 +11,7 @@ import {
   initApp,
   getState,
   getActivePage,
+  getTrashedPages,
   setActivePage,
   openHome,
   setSearchQuery,
@@ -23,7 +24,11 @@ import {
   createSubPage,
   updateActivePage,
   deletePage,
+  restorePage,
+  permanentDeletePage,
+  duplicatePage,
   toggleFavorite,
+  togglePrivateSection,
   addCodeFusionMessage,
   openCalendarPlus,
   closeCalendarPlus,
@@ -38,6 +43,14 @@ import {
   enterDemoMode,
   togglePageExpanded,
 } from './utils/state.js'
+import {
+  signIn,
+  signUp,
+  signOut,
+  onAuthStateChange,
+  formatAuthError,
+} from './utils/supabaseSync.js'
+import { isSupabaseConfigured } from './utils/supabase.js'
 
 let toastTimer
 
@@ -63,6 +76,114 @@ function renderLoading(app) {
       <p>Loading TaskScape…</p>
     </div>
   `
+}
+
+function getModalRoots() {
+  let modalRoot = document.getElementById('modal-root')
+  if (!modalRoot) {
+    modalRoot = document.createElement('div')
+    modalRoot.id = 'modal-root'
+    modalRoot.innerHTML = `
+      <div id="auth-modal-root"></div>
+      <div id="share-modal-root"></div>
+      <div id="templates-modal-root"></div>
+      <div id="trash-modal-root"></div>
+      <div id="inbox-modal-root"></div>
+      <div id="event-modal-root"></div>
+      <div id="shortcuts-modal-root"></div>
+    `
+    document.body.appendChild(modalRoot)
+  }
+  return {
+    auth: document.getElementById('auth-modal-root'),
+    share: document.getElementById('share-modal-root'),
+    templates: document.getElementById('templates-modal-root'),
+    trash: document.getElementById('trash-modal-root'),
+    inbox: document.getElementById('inbox-modal-root'),
+    event: document.getElementById('event-modal-root'),
+    shortcuts: document.getElementById('shortcuts-modal-root'),
+  }
+}
+
+function renderModals(state, activePage) {
+  const roots = getModalRoots()
+
+  renderAuthModal(roots.auth, {
+    open: state.authModalOpen,
+    user: state.user,
+    configured: isSupabaseConfigured,
+    onClose: closeAuthModal,
+    onSignIn: async (email, password) => {
+      const { error } = await signIn(email, password)
+      if (error) throw new Error(formatAuthError(error))
+      closeAuthModal()
+      showToast('Signed in — syncing your workspace')
+    },
+    onSignUp: async (email, password) => {
+      const { error } = await signUp(email, password)
+      if (error) throw new Error(formatAuthError(error))
+      showToast('Account created! You can sign in now.')
+    },
+    onSignOut: async () => {
+      await signOut()
+      closeAuthModal()
+      showToast('Signed out')
+    },
+  })
+
+  renderShareModal(roots.share, {
+    open: state.shareModalOpen,
+    page: activePage,
+    onClose: closeShareModal,
+  })
+
+  renderTemplatesModal(roots.templates, {
+    open: state.templatesModalOpen,
+    onClose: closeTemplatesModal,
+    onSelectTemplate: (template) => {
+      createPage(template)
+      showToast(`Created page from "${template.title}" template`)
+    },
+  })
+
+  renderTrashModal(roots.trash, {
+    open: state.trashModalOpen,
+    trashedPages: getTrashedPages(),
+    onClose: closeTrashModal,
+    onRestore: (id) => {
+      restorePage(id)
+      showToast('Page restored')
+    },
+    onPermanentDelete: (id) => {
+      permanentDeletePage(id)
+      showToast('Page permanently deleted')
+    },
+  })
+
+  renderInboxPanel(roots.inbox, {
+    open: state.inboxModalOpen,
+    pages: state.pages.filter((p) => !p.trashed),
+    onClose: closeInboxModal,
+    onSelectPage: (id) => {
+      setActivePage(id)
+      showToast('Opened from inbox')
+    },
+  })
+
+  renderEventModal(roots.event, {
+    open: state.eventModalOpen,
+    dateKey: state.selectedDateKey,
+    onClose: closeEventModal,
+    onSubmit: (payload) => {
+      calendarAddEvent(payload)
+      showToast('Event added')
+    },
+  })
+
+  renderShortcutsModal(roots.shortcuts, {
+    open: state.shortcutsModalOpen,
+    onClose: closeShortcutsModal,
+  })
 }
 
 function renderApp() {
@@ -215,6 +336,8 @@ function renderApp() {
       }, 450)
     },
   })
+
+  renderModals(state, activePage)
 
   app.querySelector('[data-action="close-mobile-sidebar"]')?.addEventListener('click', closeMobileSidebar)
 }

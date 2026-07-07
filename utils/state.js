@@ -57,7 +57,7 @@ const DEFAULT_PAGES = [
     icon: '✅',
     cover: 'sunset',
     content:
-      '☐ Finish Phase 3 UI\n☐ Present to professor\n☐ Plan Phase 4 backend\n☐ Integrate CodeFusion with Gemini API',
+      '☐ Finish Phase 3 UI\n☐ Present to professor\n☐ Connect Supabase backend\n☐ Integrate CodeFusion with Gemini API',
     favorite: false,
     sortOrder: 2,
     updatedAt: Date.now() - 172800000,
@@ -115,6 +115,7 @@ function persistLocal() {
       calendarEvents: getCalendarEvents(),
       demoMode,
     })
+    scheduleCloudSync()
   }, 400)
 }
 
@@ -308,7 +309,8 @@ export function getState() {
 }
 
 export function getActivePage() {
-  return pages.find((page) => page.id === activePageId) ?? pages[0]
+  const active = pages.find((page) => page.id === activePageId && !page.trashed)
+  return active ?? pages.find((p) => !p.trashed) ?? pages[0]
 }
 
 export function getPageAncestors(pageId) {
@@ -553,7 +555,7 @@ export function createPage(parentId = null) {
     title: 'Untitled',
     icon: '📄',
     cover: 'ocean',
-    content: '',
+    content: template?.content ?? '',
     favorite: false,
     sortOrder: siblings.length,
     updatedAt: Date.now(),
@@ -673,6 +675,22 @@ export async function deletePage(id) {
   }
   notify()
   persistLocal()
+}
+
+export function restorePage(id) {
+  pages = pages.map((page) =>
+    page.id === id ? { ...page, trashed: false, updatedAt: Date.now() } : page
+  )
+  notify()
+}
+
+export function permanentDeletePage(id) {
+  pages = pages.filter((page) => page.id !== id)
+  if (user) deletePageFromCloud(id).catch(() => setSyncStatus('error'))
+  if (activePageId === id) {
+    activePageId = pages.find((p) => !p.trashed)?.id ?? pages[0]?.id
+  }
+  notify()
 }
 
 export function toggleFavorite(id) {
