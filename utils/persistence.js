@@ -17,3 +17,11 @@ export function saveToStorage(data) {
     /* ignore quota errors */
   }
 }
+
+export function clearStorage() {
+  try {
+    localStorage.removeItem(STORAGE_KEY)
+  } catch {
+    /* ignore */
+  }
+}

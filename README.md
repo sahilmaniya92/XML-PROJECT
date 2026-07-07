@@ -43,11 +43,16 @@ MY PROJECT/
 │   ├── topbar.js           # Top navigation bar
 │   ├── editor.js           # Notion-style page editor
 │   ├── home.js             # Home dashboard
+│   ├── auth.js             # Login / signup screen
 │   ├── calendar.js         # Calendar Plus view
 │   └── codefusion.js       # CodeFusion AI side panel
+├── supabase/
+│   └── schema.sql          # Database schema (run in Supabase SQL Editor)
 ├── styles/
 │   └── styles.css          # Tailwind + Notion-style design tokens
 └── utils/
+    ├── supabase.js         # Supabase client
+    ├── db.js               # Cloud CRUD + realtime subscriptions
     ├── state.js            # Central app state & page CRUD
     ├── persistence.js      # localStorage save/load
     ├── slashMenu.js        # "/" block command menu
@@ -60,13 +65,47 @@ MY PROJECT/
 
 ## Features
 
+- **User authentication** — email/password login & signup via Supabase Auth
+- **Cloud sync** — pages and calendar events saved to Supabase with realtime updates
+- **Nested sub-pages** — create pages inside pages (Notion-style tree in sidebar)
 - **Home dashboard** — greeting, recently visited pages, favorites, quick actions
-- **Sidebar** — workspace header, search, Home / Inbox / Calendar Plus, page list, favorites
-- **Block editor** — cover image, page icon, slash commands (`/`), to-do checkboxes, callouts, dividers
-- **Calendar Plus** — monthly grid, event add/delete, upcoming list
-- **CodeFusion AI** — side panel with quick actions (Gemini API planned for later phase)
-- **Persistence** — pages and settings auto-save to `localStorage`
+- **Block editor** — cover image, page icon, slash commands (`/`), to-do checkboxes, callouts
+- **Calendar Plus** — monthly grid, event add/delete, synced to cloud
+- **CodeFusion AI** — side panel with quick actions (Gemini API planned)
+- **Demo mode** — works offline with localStorage when Supabase is not configured
 - **Responsive** — mobile sidebar drawer, adaptive layout
+
+---
+
+## Supabase Setup
+
+### 1. Create a Supabase project
+Go to [supabase.com](https://supabase.com) → New Project.
+
+### 2. Run the database schema
+Open **SQL Editor** in your Supabase dashboard and paste the contents of `supabase/schema.sql`, then click **Run**.
+
+### 3. Enable Email Auth
+In **Authentication → Providers**, ensure **Email** is enabled.
+
+### 4. Configure environment variables
+```bash
+cp .env.example .env
+```
+Edit `.env` with your project values from **Settings → API**:
+```
+VITE_SUPABASE_URL=https://xxxxx.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
+
+### 5. Restart the dev server
+```bash
+npm run dev
+```
+
+You will see the login screen. Create an account or log in — your workspace syncs across devices automatically.
+
+> **Without Supabase:** The app opens in demo mode using localStorage only. Click **Continue in demo mode** on the auth screen.
 
 ---
 
@@ -240,11 +279,9 @@ MY PROJECT/
 
 ---
 
-## Future Phases (not yet built)
+## Remaining Future Work
 
-- Supabase backend for real multi-user sync
-- User authentication (login / signup)
 - CodeFusion connected to Gemini API
-- Real-time collaboration
-- Page nesting (sub-pages)
 - Drag-and-drop block reordering
+- Real-time collaborative cursors (multi-user editing)
+- Page sharing between users

@@ -80,9 +80,17 @@ export function deleteCalendarEvent(id) {
 }
 
 export function loadCalendarEvents(events) {
-  if (Array.isArray(events) && events.length) {
+  if (Array.isArray(events)) {
     calendarEvents = structuredClone(events)
   }
+}
+
+export function getCalendarEvents() {
+  return calendarEvents
+}
+
+export function setCalendarEvents(events) {
+  calendarEvents = structuredClone(events)
 }
 
 export function formatDateKey(date) {

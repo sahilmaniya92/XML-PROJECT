@@ -7,7 +7,7 @@ const PAGE_ICONS = ['📝', '📋', '✅', '📌', '🎯', '💡', '📚', '🗂
 /**
  * Renders the Notion-style page editor.
  */
-export function renderEditor(container, { activePage, onUpdatePage, onOpenCodeFusion, onToggleFavorite }) {
+export function renderEditor(container, { activePage, childCount = 0, onUpdatePage, onOpenCodeFusion, onToggleFavorite, onCreateSubPage }) {
   const coverCss = getCoverCss(activePage.cover)
   const hasCover = activePage.cover && activePage.cover !== 'none'
 
@@ -44,8 +44,11 @@ export function renderEditor(container, { activePage, onUpdatePage, onOpenCodeFu
 
         <div class="editor-properties">
           <button type="button" class="editor-prop" data-action="toggle-favorite">
-            ${activePage.favorite ? '★' : '☆'} ${activePage.favorite ? 'Favorited' : 'Add to favorites'}
+            ${activePage.favorite ? '★' : '☆'} ${activePage.favorite ? 'Favorited' : 'Favorite'}
           </button>
+          <span class="editor-prop-divider">·</span>
+          <button type="button" class="editor-prop editor-prop-action" data-action="subpage">+ Add sub-page</button>
+          ${childCount ? `<span class="editor-prop-divider">·</span><span class="editor-prop-muted">${childCount} sub-page${childCount > 1 ? 's' : ''}</span>` : ''}
           <span class="editor-prop-divider">·</span>
           <span class="editor-prop-muted">Press <kbd>/</kbd> for blocks</span>
         </div>
@@ -145,6 +148,7 @@ export function renderEditor(container, { activePage, onUpdatePage, onOpenCodeFu
   })
 
   container.querySelector('[data-action="toggle-favorite"]')?.addEventListener('click', onToggleFavorite)
+  container.querySelector('[data-action="subpage"]')?.addEventListener('click', onCreateSubPage)
 
   document.addEventListener('click', () => {
     iconPicker?.classList.add('hidden')

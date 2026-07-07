@@ -32,7 +32,7 @@ export function renderCodeFusion(container, { open, activePage, messages = [], o
           </div>
           <div class="min-w-0">
             <h2 class="text-sm font-semibold text-gray-900">CodeFusion</h2>
-            <p class="text-xs text-gray-500 truncate">AI writing assistant for TaskScape</p>
+            <p class="text-xs text-gray-500 truncate">AI writing assistant for CodeFusion</p>
           </div>
         </div>
         <button type="button" class="icon-btn" data-action="close" aria-label="Close CodeFusion">
