@@ -11,8 +11,12 @@ export function renderSidebar(container, {
   onDeletePage,
   onOpenCalendarPlus,
   onOpenHome,
+  onOpenAuth,
+  onOpenTemplates,
+  onOpenTrash,
+  onOpenInbox,
 }) {
-  const { activePageId, searchQuery, activeView } = getState()
+  const { activePageId, searchQuery, activeView, user } = getState()
   const pages = getFilteredPages()
   const favorites = pages.filter((page) => page.favorite)
   const privatePages = pages.filter((page) => !page.favorite)
@@ -103,6 +107,10 @@ export function renderSidebar(container, {
       </div>
 
       <div class="sidebar-footer">
+        <button type="button" class="sidebar-auth-btn" data-action="auth">
+          <span class="sidebar-auth-avatar">${user ? user.email?.[0]?.toUpperCase() ?? 'U' : '👤'}</span>
+          <span class="sidebar-auth-label">${user ? 'Account' : 'Sign in'}</span>
+        </button>
         <button type="button" class="sidebar-new-page" data-action="new-page">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sidebar-nav-icon"><path d="M12 5v14M5 12h14"/></svg>
           <span>New page</span>
@@ -143,6 +151,10 @@ export function renderSidebar(container, {
 
   container.querySelector('[data-action="calendar-plus"]')?.addEventListener('click', onOpenCalendarPlus)
   container.querySelector('[data-action="home"]')?.addEventListener('click', onOpenHome)
+  container.querySelector('[data-action="inbox"]')?.addEventListener('click', onOpenInbox)
+  container.querySelector('[data-action="templates"]')?.addEventListener('click', onOpenTemplates)
+  container.querySelector('[data-action="trash"]')?.addEventListener('click', onOpenTrash)
+  container.querySelector('[data-action="auth"]')?.addEventListener('click', onOpenAuth)
 
   container.querySelectorAll('[data-action="new-page"]').forEach((button) => {
     button.addEventListener('click', () => onNewPage(false))

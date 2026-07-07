@@ -8,10 +8,19 @@ import {
   renderCodeFusion,
   getCodeFusionResponse,
 } from './components/codefusion.js'
+import { renderAuthModal } from './components/auth.js'
+import {
+  renderEventModal,
+  renderShareModal,
+  renderTemplatesModal,
+  renderTrashModal,
+  renderInboxPanel,
+} from './components/modal.js'
 import {
   subscribe,
   getState,
   getActivePage,
+  getTrashedPages,
   setActivePage,
   openHome,
   setSearchQuery,
@@ -23,6 +32,8 @@ import {
   createPage,
   updateActivePage,
   deletePage,
+  restorePage,
+  permanentDeletePage,
   toggleFavorite,
   addCodeFusionMessage,
   openCalendarPlus,
@@ -32,7 +43,29 @@ import {
   calendarSelectDate,
   calendarAddEvent,
   calendarDeleteEvent,
+  openAuthModal,
+  closeAuthModal,
+  openShareModal,
+  closeShareModal,
+  openTemplatesModal,
+  closeTemplatesModal,
+  openTrashModal,
+  closeTrashModal,
+  openInboxModal,
+  closeInboxModal,
+  openEventModal,
+  closeEventModal,
+  setUser,
+  loadFromSupabase,
+  resetToLocalDefaults,
 } from './utils/state.js'
+import {
+  signIn,
+  signUp,
+  signOut,
+  onAuthStateChange,
+} from './utils/supabaseSync.js'
+import { isSupabaseConfigured } from './utils/supabase.js'
 
 let toastTimer
 
@@ -48,6 +81,107 @@ function showToast(message) {
   toast.classList.add('is-visible')
   clearTimeout(toastTimer)
   toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 2200)
+}
+
+function getModalRoots() {
+  let modalRoot = document.getElementById('modal-root')
+  if (!modalRoot) {
+    modalRoot = document.createElement('div')
+    modalRoot.id = 'modal-root'
+    modalRoot.innerHTML = `
+      <div id="auth-modal-root"></div>
+      <div id="share-modal-root"></div>
+      <div id="templates-modal-root"></div>
+      <div id="trash-modal-root"></div>
+      <div id="inbox-modal-root"></div>
+      <div id="event-modal-root"></div>
+    `
+    document.body.appendChild(modalRoot)
+  }
+  return {
+    auth: document.getElementById('auth-modal-root'),
+    share: document.getElementById('share-modal-root'),
+    templates: document.getElementById('templates-modal-root'),
+    trash: document.getElementById('trash-modal-root'),
+    inbox: document.getElementById('inbox-modal-root'),
+    event: document.getElementById('event-modal-root'),
+  }
+}
+
+function renderModals(state, activePage) {
+  const roots = getModalRoots()
+
+  renderAuthModal(roots.auth, {
+    open: state.authModalOpen,
+    user: state.user,
+    configured: isSupabaseConfigured,
+    onClose: closeAuthModal,
+    onSignIn: async (email, password) => {
+      const { error } = await signIn(email, password)
+      if (error) throw error
+      closeAuthModal()
+      showToast('Signed in — syncing your workspace')
+    },
+    onSignUp: async (email, password) => {
+      const { error } = await signUp(email, password)
+      if (error) throw error
+      showToast('Account created! Check your email to confirm, then sign in.')
+    },
+    onSignOut: async () => {
+      await signOut()
+      closeAuthModal()
+      showToast('Signed out')
+    },
+  })
+
+  renderShareModal(roots.share, {
+    open: state.shareModalOpen,
+    page: activePage,
+    onClose: closeShareModal,
+  })
+
+  renderTemplatesModal(roots.templates, {
+    open: state.templatesModalOpen,
+    onClose: closeTemplatesModal,
+    onSelectTemplate: (template) => {
+      createPage(template)
+      showToast(`Created page from "${template.title}" template`)
+    },
+  })
+
+  renderTrashModal(roots.trash, {
+    open: state.trashModalOpen,
+    trashedPages: getTrashedPages(),
+    onClose: closeTrashModal,
+    onRestore: (id) => {
+      restorePage(id)
+      showToast('Page restored')
+    },
+    onPermanentDelete: (id) => {
+      permanentDeletePage(id)
+      showToast('Page permanently deleted')
+    },
+  })
+
+  renderInboxPanel(roots.inbox, {
+    open: state.inboxModalOpen,
+    pages: state.pages.filter((p) => !p.trashed),
+    onClose: closeInboxModal,
+    onSelectPage: (id) => {
+      setActivePage(id)
+      showToast('Opened from inbox')
+    },
+  })
+
+  renderEventModal(roots.event, {
+    open: state.eventModalOpen,
+    dateKey: state.selectedDateKey,
+    onClose: closeEventModal,
+    onSubmit: (payload) => {
+      calendarAddEvent(payload)
+      showToast('Event added')
+    },
+  })
 }
 
 function renderApp() {
@@ -99,6 +233,10 @@ function renderApp() {
     },
     onOpenCalendarPlus: openCalendarPlus,
     onOpenHome: openHome,
+    onOpenAuth: openAuthModal,
+    onOpenTemplates: openTemplatesModal,
+    onOpenTrash: openTrashModal,
+    onOpenInbox: openInboxModal,
   })
 
   if (state.activeView === 'calendar') {
@@ -108,10 +246,7 @@ function renderApp() {
       onPrevMonth: calendarPrevMonth,
       onNextMonth: calendarNextMonth,
       onSelectDate: calendarSelectDate,
-      onAddEvent: (payload) => {
-        calendarAddEvent(payload)
-        showToast('Event added')
-      },
+      onAddEvent: openEventModal,
       onDeleteEvent: (id) => {
         calendarDeleteEvent(id)
         showToast('Event removed')
@@ -121,6 +256,8 @@ function renderApp() {
     renderTopbar(document.getElementById('topbar'), {
       activePage,
       activeView: state.activeView,
+      syncStatus: state.syncStatus,
+      user: state.user,
       onToggleSidebar: toggleSidebar,
       onToggleMobileSidebar: toggleMobileSidebar,
       onToggleCodeFusion: toggleCodeFusion,
@@ -129,6 +266,8 @@ function renderApp() {
         showToast(activePage.favorite ? 'Removed from favorites' : 'Added to favorites')
       },
       onSave: () => showToast('All changes saved'),
+      onShare: openShareModal,
+      onOpenAuth: openAuthModal,
     })
 
     if (state.activeView === 'home') {
@@ -163,8 +302,37 @@ function renderApp() {
     },
   })
 
+  renderModals(state, activePage)
+
   app.querySelector('[data-action="close-mobile-sidebar"]')?.addEventListener('click', closeMobileSidebar)
 }
 
 subscribe(renderApp)
 renderApp()
+
+// Supabase auth listener
+onAuthStateChange(async (event, session) => {
+  const nextUser = session?.user ?? null
+  setUser(nextUser)
+
+  if (event === 'SIGNED_IN' && nextUser) {
+    try {
+      await loadFromSupabase(nextUser.id)
+    } catch {
+      showToast('Could not load cloud data — using local copy')
+    }
+  }
+
+  if (event === 'SIGNED_OUT') {
+    resetToLocalDefaults()
+  }
+})
+
+// Deep link: ?page=page-id
+const pageParam = new URLSearchParams(window.location.search).get('page')
+if (pageParam) {
+  const state = getState()
+  if (state.pages.some((p) => p.id === pageParam && !p.trashed)) {
+    setActivePage(pageParam)
+  }
+}

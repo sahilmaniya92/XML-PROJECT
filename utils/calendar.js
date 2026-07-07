@@ -80,6 +80,10 @@ export function deleteCalendarEvent(id) {
 }
 
 export function loadCalendarEvents(events) {
+  if (events === null) {
+    calendarEvents = structuredClone(DEFAULT_EVENTS)
+    return
+  }
   if (Array.isArray(events) && events.length) {
     calendarEvents = structuredClone(events)
   }

@@ -8,6 +8,15 @@ import {
   loadCalendarEvents,
 } from './calendar.js'
 import { loadFromStorage, saveToStorage } from './persistence.js'
+import {
+  fetchUserData,
+  syncPages,
+  syncCalendarEvents,
+  syncUserSettings,
+  deletePageFromCloud,
+  deleteEventFromCloud,
+} from './supabaseSync.js'
+import { isSupabaseConfigured } from './supabase.js'
 
 const DEFAULT_PAGES = [
   {
@@ -18,6 +27,7 @@ const DEFAULT_PAGES = [
     content:
       'Welcome to TaskScape\n\nThis is your workspace for notes, tasks, and ideas — inspired by Notion.\n\nType / anywhere to insert blocks, or use the sidebar to switch pages.',
     favorite: true,
+    trashed: false,
     updatedAt: Date.now(),
   },
   {
@@ -26,8 +36,9 @@ const DEFAULT_PAGES = [
     icon: '📋',
     cover: 'forest',
     content:
-      '## Meeting Notes\n\n• Define project phases\n• Assign team roles\n• Review UI with professor\n\n## Next Steps\n\nConnect Supabase in a future phase.',
+      '## Meeting Notes\n\n• Define project phases\n• Assign team roles\n• Review UI with professor\n\n## Next Steps\n\nYour data syncs to Supabase when signed in.',
     favorite: false,
+    trashed: false,
     updatedAt: Date.now() - 86400000,
   },
   {
@@ -36,8 +47,9 @@ const DEFAULT_PAGES = [
     icon: '✅',
     cover: 'sunset',
     content:
-      '☐ Finish Phase 3 UI\n☐ Present to professor\n☐ Plan Phase 4 backend\n☐ Integrate CodeFusion with Gemini API',
+      '☐ Finish Phase 3 UI\n☐ Present to professor\n☐ Connect Supabase backend\n☐ Integrate CodeFusion with Gemini API',
     favorite: false,
+    trashed: false,
     updatedAt: Date.now() - 172800000,
   },
 ]
@@ -58,12 +70,23 @@ let codefusionMessages = stored?.codefusionMessages ?? [
 ]
 let activeView = stored?.activeView ?? 'home'
 
+// Auth & sync
+let user = null
+let syncStatus = isSupabaseConfigured ? 'idle' : 'offline'
+let authModalOpen = false
+let shareModalOpen = false
+let templatesModalOpen = false
+let trashModalOpen = false
+let inboxModalOpen = false
+let eventModalOpen = false
+
 if (stored?.calendarEvents) {
   loadCalendarEvents(stored.calendarEvents)
 }
 
 const listeners = new Set()
 let persistTimer
+let cloudSyncTimer
 
 function persist() {
   clearTimeout(persistTimer)
@@ -76,7 +99,34 @@ function persist() {
       activeView,
       calendarEvents: getCalendarState().calendarEvents,
     })
+    scheduleCloudSync()
   }, 400)
+}
+
+function scheduleCloudSync() {
+  if (!user) return
+  clearTimeout(cloudSyncTimer)
+  cloudSyncTimer = setTimeout(async () => {
+    try {
+      setSyncStatus('syncing')
+      await syncPages(user.id, pages)
+      await syncCalendarEvents(user.id, getCalendarState().calendarEvents)
+      await syncUserSettings(user.id, {
+        activePageId,
+        sidebarOpen,
+        activeView,
+        codefusionMessages,
+      })
+      setSyncStatus('synced')
+    } catch {
+      setSyncStatus('error')
+    }
+  }, 800)
+}
+
+function setSyncStatus(status) {
+  syncStatus = status
+  listeners.forEach((listener) => listener(getState()))
 }
 
 export function subscribe(listener) {
@@ -94,6 +144,15 @@ export function getState() {
     searchQuery,
     codefusionMessages,
     activeView,
+    user,
+    syncStatus,
+    authModalOpen,
+    shareModalOpen,
+    templatesModalOpen,
+    trashModalOpen,
+    inboxModalOpen,
+    eventModalOpen,
+    isSupabaseConfigured,
     ...getCalendarState(),
   }
 }
@@ -104,21 +163,30 @@ function notify() {
 }
 
 export function getActivePage() {
-  return pages.find((page) => page.id === activePageId) ?? pages[0]
+  const active = pages.find((page) => page.id === activePageId && !page.trashed)
+  return active ?? pages.find((p) => !p.trashed) ?? pages[0]
 }
 
 export function getFilteredPages() {
   const query = searchQuery.trim().toLowerCase()
-  if (!query) return pages
-  return pages.filter(
+  const visible = pages.filter((page) => !page.trashed)
+  if (!query) return visible
+  return visible.filter(
     (page) =>
       page.title.toLowerCase().includes(query) ||
       page.content.toLowerCase().includes(query)
   )
 }
 
+export function getTrashedPages() {
+  return pages.filter((page) => page.trashed)
+}
+
 export function getRecentPages(limit = 6) {
-  return [...pages].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, limit)
+  return [...pages]
+    .filter((p) => !p.trashed)
+    .sort((a, b) => b.updatedAt - a.updatedAt)
+    .slice(0, limit)
 }
 
 export function setActivePage(id) {
@@ -164,15 +232,114 @@ export function closeCodeFusion() {
   notify()
 }
 
-export function createPage() {
+export function openAuthModal() {
+  authModalOpen = true
+  notify()
+}
+
+export function closeAuthModal() {
+  authModalOpen = false
+  notify()
+}
+
+export function openShareModal() {
+  shareModalOpen = true
+  notify()
+}
+
+export function closeShareModal() {
+  shareModalOpen = false
+  notify()
+}
+
+export function openTemplatesModal() {
+  templatesModalOpen = true
+  notify()
+}
+
+export function closeTemplatesModal() {
+  templatesModalOpen = false
+  notify()
+}
+
+export function openTrashModal() {
+  trashModalOpen = true
+  notify()
+}
+
+export function closeTrashModal() {
+  trashModalOpen = false
+  notify()
+}
+
+export function openInboxModal() {
+  inboxModalOpen = true
+  notify()
+}
+
+export function closeInboxModal() {
+  inboxModalOpen = false
+  notify()
+}
+
+export function openEventModal() {
+  eventModalOpen = true
+  notify()
+}
+
+export function closeEventModal() {
+  eventModalOpen = false
+  notify()
+}
+
+export function setUser(newUser) {
+  user = newUser
+  notify()
+}
+
+export async function loadFromSupabase(userId) {
+  const data = await fetchUserData(userId)
+  if (!data) return
+
+  if (data.pages) pages = data.pages
+  if (data.calendarEvents) loadCalendarEvents(data.calendarEvents)
+  if (data.activePageId && pages.some((p) => p.id === data.activePageId)) {
+    activePageId = data.activePageId
+  } else {
+    activePageId = pages.find((p) => !p.trashed)?.id ?? pages[0]?.id
+  }
+  if (data.sidebarOpen !== null && data.sidebarOpen !== undefined) sidebarOpen = data.sidebarOpen
+  if (data.activeView) activeView = data.activeView
+  if (data.codefusionMessages) codefusionMessages = data.codefusionMessages
+
+  setSyncStatus('synced')
+  notify()
+}
+
+export function resetToLocalDefaults() {
+  pages = structuredClone(DEFAULT_PAGES)
+  activePageId = pages[0].id
+  activeView = 'home'
+  codefusionMessages = [
+    {
+      role: 'ai',
+      text: "Hi! I'm CodeFusion, your AI assistant. Choose a quick action or type a prompt below.",
+    },
+  ]
+  loadCalendarEvents(null)
+  notify()
+}
+
+export function createPage(template) {
   const id = `page-${Date.now()}`
   const newPage = {
     id,
-    title: 'Untitled',
-    icon: '📄',
+    title: template?.title ?? 'Untitled',
+    icon: template?.icon ?? '📄',
     cover: 'ocean',
-    content: '',
+    content: template?.content ?? '',
     favorite: false,
+    trashed: false,
     updatedAt: Date.now(),
   }
   pages = [newPage, ...pages]
@@ -223,6 +390,7 @@ export function calendarAddEvent(payload) {
 
 export function calendarDeleteEvent(id) {
   deleteCalendarEvent(id)
+  if (user) deleteEventFromCloud(id).catch(() => setSyncStatus('error'))
   notify()
 }
 
@@ -242,11 +410,30 @@ export function addCodeFusionMessage(role, text) {
 }
 
 export function deletePage(id) {
-  if (pages.length <= 1) return
-  pages = pages.filter((page) => page.id !== id)
+  const visible = pages.filter((p) => !p.trashed)
+  if (visible.length <= 1 && !pages.find((p) => p.id === id)?.trashed) return
+  pages = pages.map((page) =>
+    page.id === id ? { ...page, trashed: true, updatedAt: Date.now() } : page
+  )
   if (activePageId === id) {
-    activePageId = pages[0].id
+    activePageId = pages.find((p) => !p.trashed)?.id ?? pages[0].id
     activeView = 'page'
+  }
+  notify()
+}
+
+export function restorePage(id) {
+  pages = pages.map((page) =>
+    page.id === id ? { ...page, trashed: false, updatedAt: Date.now() } : page
+  )
+  notify()
+}
+
+export function permanentDeletePage(id) {
+  pages = pages.filter((page) => page.id !== id)
+  if (user) deletePageFromCloud(id).catch(() => setSyncStatus('error'))
+  if (activePageId === id) {
+    activePageId = pages.find((p) => !p.trashed)?.id ?? pages[0]?.id
   }
   notify()
 }

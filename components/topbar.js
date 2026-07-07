@@ -6,15 +6,30 @@ import { formatRelativeTime } from '../utils/state.js'
 export function renderTopbar(container, {
   activePage,
   activeView,
+  syncStatus,
+  user,
   onToggleSidebar,
   onToggleMobileSidebar,
   onToggleCodeFusion,
   onToggleFavorite,
   onSave,
+  onShare,
+  onOpenAuth,
 }) {
   const isHome = activeView === 'home'
   const title = isHome ? 'Home' : activePage?.title ?? 'Untitled'
   const icon = isHome ? '🏠' : activePage?.icon ?? '📄'
+
+  const syncLabel =
+    syncStatus === 'syncing'
+      ? 'Syncing…'
+      : syncStatus === 'synced'
+        ? 'Synced'
+        : syncStatus === 'error'
+          ? 'Sync error'
+          : user
+            ? 'Cloud'
+            : 'Local'
 
   container.innerHTML = `
     <div class="topbar">
@@ -39,6 +54,15 @@ export function renderTopbar(container, {
       </div>
 
       <div class="topbar-right">
+        <button
+          type="button"
+          class="sync-pill sync-pill-${syncStatus}"
+          data-action="auth"
+          title="${user ? user.email : 'Sign in to sync with Supabase'}"
+        >
+          <span class="sync-dot"></span>
+          ${syncLabel}
+        </button>
         ${
           !isHome
             ? `
@@ -46,7 +70,7 @@ export function renderTopbar(container, {
         <button type="button" class="icon-btn hidden sm:inline-flex" data-action="favorite" aria-label="Toggle favorite">
           ${activePage.favorite ? '★' : '☆'}
         </button>
-        <button type="button" class="topbar-btn hidden sm:inline-flex" aria-label="Share page">
+        <button type="button" class="topbar-btn hidden sm:inline-flex" data-action="share" aria-label="Share page">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
             <path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M16 6l-4-4-4 4M12 2v14"/>
           </svg>
@@ -78,6 +102,8 @@ export function renderTopbar(container, {
   container.querySelector('[data-action="codefusion"]')?.addEventListener('click', onToggleCodeFusion)
   container.querySelector('[data-action="save"]')?.addEventListener('click', onSave)
   container.querySelector('[data-action="favorite"]')?.addEventListener('click', onToggleFavorite)
+  container.querySelector('[data-action="share"]')?.addEventListener('click', onShare)
+  container.querySelector('[data-action="auth"]')?.addEventListener('click', onOpenAuth)
 }
 
 function escapeHtml(value) {

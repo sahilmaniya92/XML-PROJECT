@@ -7,8 +7,6 @@ import {
 } from '../utils/calendar.js'
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const COLORS = ['#7c3aed', '#2563eb', '#059669', '#dc2626', '#d97706']
-
 /**
  * Renders the Calendar Plus full view.
  */
@@ -130,12 +128,7 @@ export function renderCalendarPlus(container, { onBack, onPrevMonth, onNextMonth
   container.querySelectorAll('[data-action="prev-month"]').forEach((btn) => btn.addEventListener('click', onPrevMonth))
   container.querySelectorAll('[data-action="next-month"]').forEach((btn) => btn.addEventListener('click', onNextMonth))
   container.querySelectorAll('[data-action="add-event"]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const title = prompt('Event title')
-      if (title === null) return
-      const color = COLORS[Math.floor(Math.random() * COLORS.length)]
-      onAddEvent({ title, date: selectedDateKey, color })
-    })
+    btn.addEventListener('click', () => onAddEvent())
   })
 
   container.querySelectorAll('[data-date]').forEach((button) => {
