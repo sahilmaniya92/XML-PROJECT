@@ -79,6 +79,8 @@ let templatesModalOpen = false
 let trashModalOpen = false
 let inboxModalOpen = false
 let eventModalOpen = false
+let shortcutsModalOpen = false
+let privateSectionCollapsed = stored?.privateSectionCollapsed ?? false
 
 if (stored?.calendarEvents) {
   loadCalendarEvents(stored.calendarEvents)
@@ -98,6 +100,7 @@ function persist() {
       codefusionMessages,
       activeView,
       calendarEvents: getCalendarState().calendarEvents,
+      privateSectionCollapsed,
     })
     scheduleCloudSync()
   }, 400)
@@ -152,7 +155,9 @@ export function getState() {
     trashModalOpen,
     inboxModalOpen,
     eventModalOpen,
+    shortcutsModalOpen,
     isSupabaseConfigured,
+    privateSectionCollapsed,
     ...getCalendarState(),
   }
 }
@@ -232,6 +237,29 @@ export function closeCodeFusion() {
   notify()
 }
 
+export function togglePrivateSection() {
+  privateSectionCollapsed = !privateSectionCollapsed
+  notify()
+}
+
+export function duplicatePage(id) {
+  const page = pages.find((p) => p.id === id)
+  if (!page) return null
+  const newPage = {
+    ...structuredClone(page),
+    id: `page-${Date.now()}`,
+    title: page.title === 'Untitled' ? 'Untitled (copy)' : `${page.title} (copy)`,
+    trashed: false,
+    updatedAt: Date.now(),
+  }
+  pages = [newPage, ...pages]
+  activePageId = newPage.id
+  activeView = 'page'
+  mobileSidebarOpen = false
+  notify()
+  return newPage
+}
+
 export function openAuthModal() {
   authModalOpen = true
   notify()
@@ -289,6 +317,16 @@ export function openEventModal() {
 
 export function closeEventModal() {
   eventModalOpen = false
+  notify()
+}
+
+export function openShortcutsModal() {
+  shortcutsModalOpen = true
+  notify()
+}
+
+export function closeShortcutsModal() {
+  shortcutsModalOpen = false
   notify()
 }
 

@@ -121,6 +121,23 @@ export async function signIn(email, password) {
   return supabase.auth.signInWithPassword({ email, password })
 }
 
+export function formatAuthError(error) {
+  const message = error?.message ?? 'Something went wrong'
+  const lower = message.toLowerCase()
+
+  if (lower.includes('rate limit') || lower.includes('email rate')) {
+    return 'Email rate limit exceeded. Wait 30–60 minutes, or sign in if you already created an account. For testing, disable email confirmation in Supabase → Authentication → Providers → Email.'
+  }
+  if (lower.includes('invalid login credentials')) {
+    return 'Wrong email or password. If you just signed up, confirm your email first or disable confirmation in Supabase.'
+  }
+  if (lower.includes('user already registered')) {
+    return 'This email is already registered. Use Sign in instead.'
+  }
+
+  return message
+}
+
 export async function signOut() {
   if (!supabase) return
   return supabase.auth.signOut()

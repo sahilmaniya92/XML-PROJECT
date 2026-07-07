@@ -1,4 +1,5 @@
 import { formatRelativeTime } from '../utils/state.js'
+import { bindDropdown } from '../utils/dropdown.js'
 
 /**
  * Renders the Notion-style top navigation bar.
@@ -15,6 +16,15 @@ export function renderTopbar(container, {
   onSave,
   onShare,
   onOpenAuth,
+  onOpenHome,
+  onDuplicatePage,
+  onDeletePage,
+  onOpenTrash,
+  onOpenCalendarPlus,
+  onCopyContent,
+  onRemoveCover,
+  onNewPage,
+  onShowShortcuts,
 }) {
   const isHome = activeView === 'home'
   const title = isHome ? 'Home' : activePage?.title ?? 'Untitled'
@@ -46,7 +56,7 @@ export function renderTopbar(container, {
         </button>
 
         <nav class="topbar-breadcrumb" aria-label="Breadcrumb">
-          <span class="topbar-crumb">TaskScape</span>
+          <button type="button" class="topbar-crumb topbar-crumb-btn" data-action="go-home">TaskScape</button>
           <span class="topbar-separator">/</span>
           <span class="topbar-crumb-icon">${icon}</span>
           <span class="topbar-crumb topbar-crumb-active">${escapeHtml(title)}</span>
@@ -90,9 +100,26 @@ export function renderTopbar(container, {
 
         <button type="button" class="topbar-btn topbar-btn-ghost hidden sm:inline-flex" data-action="save">Done</button>
 
-        <button type="button" class="icon-btn" aria-label="More options">
-          <svg viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
-        </button>
+        <div class="topbar-dropdown-wrap">
+          <button type="button" class="icon-btn" data-dropdown-toggle aria-label="More options">
+            <svg viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+          </button>
+          <div class="app-dropdown-menu app-dropdown-menu-right" data-dropdown-menu>
+            ${!isHome ? `
+            <button type="button" class="app-dropdown-item" data-dropdown-action="duplicate">📄 Duplicate page</button>
+            <button type="button" class="app-dropdown-item" data-dropdown-action="copy-content">📋 Copy page content</button>
+            <button type="button" class="app-dropdown-item" data-dropdown-action="remove-cover">🖼️ Remove cover</button>
+            <button type="button" class="app-dropdown-item" data-dropdown-action="favorite-toggle">${activePage.favorite ? '☆ Unfavorite' : '★ Add to favorites'}</button>
+            <div class="app-dropdown-divider"></div>
+            <button type="button" class="app-dropdown-item app-dropdown-danger" data-dropdown-action="delete">🗑️ Move to trash</button>
+            ` : `
+            <button type="button" class="app-dropdown-item" data-dropdown-action="new-page">📄 New page</button>
+            <button type="button" class="app-dropdown-item" data-dropdown-action="calendar">📅 Open calendar</button>
+            `}
+            <button type="button" class="app-dropdown-item" data-dropdown-action="trash">🗑️ Open trash</button>
+            <button type="button" class="app-dropdown-item" data-dropdown-action="shortcuts">⌨️ Keyboard shortcuts</button>
+          </div>
+        </div>
       </div>
     </div>
   `
@@ -104,6 +131,26 @@ export function renderTopbar(container, {
   container.querySelector('[data-action="favorite"]')?.addEventListener('click', onToggleFavorite)
   container.querySelector('[data-action="share"]')?.addEventListener('click', onShare)
   container.querySelector('[data-action="auth"]')?.addEventListener('click', onOpenAuth)
+  container.querySelector('[data-action="go-home"]')?.addEventListener('click', onOpenHome)
+
+  bindDropdown(container, {
+    toggleSelector: '[data-dropdown-toggle]',
+    menuSelector: '[data-dropdown-menu]',
+    onSelect: (action) => {
+      const actions = {
+        duplicate: onDuplicatePage,
+        'copy-content': onCopyContent,
+        'remove-cover': onRemoveCover,
+        'favorite-toggle': onToggleFavorite,
+        delete: onDeletePage,
+        'new-page': onNewPage,
+        calendar: onOpenCalendarPlus,
+        trash: onOpenTrash,
+        shortcuts: onShowShortcuts,
+      }
+      actions[action]?.()
+    },
+  })
 }
 
 function escapeHtml(value) {

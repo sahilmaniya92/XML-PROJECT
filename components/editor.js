@@ -4,17 +4,20 @@ import { COVER_GRADIENTS, getCoverCss } from '../utils/covers.js'
 
 const PAGE_ICONS = ['📝', '📋', '✅', '📌', '🎯', '💡', '📚', '🗂️', '⭐', '🔥', '📄', '🚀', '📅', '🎨', '💼', '🔖']
 
+const COVER_POSITIONS = ['center center', 'center top', 'center bottom', 'left center', 'right center']
+
 /**
  * Renders the Notion-style page editor.
  */
 export function renderEditor(container, { activePage, onUpdatePage, onOpenCodeFusion, onToggleFavorite }) {
   const coverCss = getCoverCss(activePage.cover)
   const hasCover = activePage.cover && activePage.cover !== 'none'
+  const coverPosition = activePage.coverPosition ?? 'center center'
 
   container.innerHTML = `
     <div class="editor-shell">
       <div class="editor-cover-wrap ${hasCover ? '' : 'editor-cover-hidden'}">
-        <div class="editor-cover" style="background: ${coverCss}"></div>
+        <div class="editor-cover" style="background: ${coverCss}; background-position: ${coverPosition}; background-size: cover;"></div>
         <button type="button" class="editor-cover-btn" data-action="change-cover">Change cover</button>
         <button type="button" class="editor-cover-btn editor-cover-btn-reposition" data-action="reposition-cover">Reposition</button>
       </div>
@@ -135,6 +138,14 @@ export function renderEditor(container, { activePage, onUpdatePage, onOpenCodeFu
     e.stopPropagation()
     coverPicker?.classList.toggle('hidden')
     iconPicker?.classList.add('hidden')
+  })
+
+  container.querySelector('[data-action="reposition-cover"]')?.addEventListener('click', (e) => {
+    e.stopPropagation()
+    const current = activePage.coverPosition ?? 'center center'
+    const idx = COVER_POSITIONS.indexOf(current)
+    const next = COVER_POSITIONS[(idx + 1) % COVER_POSITIONS.length]
+    onUpdatePage({ coverPosition: next })
   })
 
   coverPicker?.querySelectorAll('[data-cover]').forEach((btn) => {

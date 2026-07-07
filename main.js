@@ -15,6 +15,7 @@ import {
   renderTemplatesModal,
   renderTrashModal,
   renderInboxPanel,
+  renderShortcutsModal,
 } from './components/modal.js'
 import {
   subscribe,
@@ -34,7 +35,9 @@ import {
   deletePage,
   restorePage,
   permanentDeletePage,
+  duplicatePage,
   toggleFavorite,
+  togglePrivateSection,
   addCodeFusionMessage,
   openCalendarPlus,
   closeCalendarPlus,
@@ -55,6 +58,8 @@ import {
   closeInboxModal,
   openEventModal,
   closeEventModal,
+  openShortcutsModal,
+  closeShortcutsModal,
   setUser,
   loadFromSupabase,
   resetToLocalDefaults,
@@ -64,6 +69,7 @@ import {
   signUp,
   signOut,
   onAuthStateChange,
+  formatAuthError,
 } from './utils/supabaseSync.js'
 import { isSupabaseConfigured } from './utils/supabase.js'
 
@@ -95,6 +101,7 @@ function getModalRoots() {
       <div id="trash-modal-root"></div>
       <div id="inbox-modal-root"></div>
       <div id="event-modal-root"></div>
+      <div id="shortcuts-modal-root"></div>
     `
     document.body.appendChild(modalRoot)
   }
@@ -105,6 +112,7 @@ function getModalRoots() {
     trash: document.getElementById('trash-modal-root'),
     inbox: document.getElementById('inbox-modal-root'),
     event: document.getElementById('event-modal-root'),
+    shortcuts: document.getElementById('shortcuts-modal-root'),
   }
 }
 
@@ -118,14 +126,14 @@ function renderModals(state, activePage) {
     onClose: closeAuthModal,
     onSignIn: async (email, password) => {
       const { error } = await signIn(email, password)
-      if (error) throw error
+      if (error) throw new Error(formatAuthError(error))
       closeAuthModal()
       showToast('Signed in — syncing your workspace')
     },
     onSignUp: async (email, password) => {
       const { error } = await signUp(email, password)
-      if (error) throw error
-      showToast('Account created! Check your email to confirm, then sign in.')
+      if (error) throw new Error(formatAuthError(error))
+      showToast('Account created! You can sign in now.')
     },
     onSignOut: async () => {
       await signOut()
@@ -182,6 +190,11 @@ function renderModals(state, activePage) {
       showToast('Event added')
     },
   })
+
+  renderShortcutsModal(roots.shortcuts, {
+    open: state.shortcutsModalOpen,
+    onClose: closeShortcutsModal,
+  })
 }
 
 function renderApp() {
@@ -237,6 +250,7 @@ function renderApp() {
     onOpenTemplates: openTemplatesModal,
     onOpenTrash: openTrashModal,
     onOpenInbox: openInboxModal,
+    onTogglePrivateSection: togglePrivateSection,
   })
 
   if (state.activeView === 'calendar') {
@@ -268,6 +282,34 @@ function renderApp() {
       onSave: () => showToast('All changes saved'),
       onShare: openShareModal,
       onOpenAuth: openAuthModal,
+      onOpenHome: openHome,
+      onDuplicatePage: () => {
+        duplicatePage(activePage.id)
+        showToast('Page duplicated')
+      },
+      onDeletePage: () => {
+        deletePage(activePage.id)
+        showToast('Page moved to trash')
+      },
+      onOpenTrash: openTrashModal,
+      onOpenCalendarPlus: openCalendarPlus,
+      onCopyContent: async () => {
+        try {
+          await navigator.clipboard.writeText(activePage.content || '')
+          showToast('Page content copied')
+        } catch {
+          showToast('Could not copy content')
+        }
+      },
+      onRemoveCover: () => {
+        updateActivePage({ cover: 'none' })
+        showToast('Cover removed')
+      },
+      onNewPage: () => {
+        createPage()
+        showToast('New page created')
+      },
+      onShowShortcuts: openShortcutsModal,
     })
 
     if (state.activeView === 'home') {
@@ -325,6 +367,29 @@ onAuthStateChange(async (event, session) => {
 
   if (event === 'SIGNED_OUT') {
     resetToLocalDefaults()
+  }
+})
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.key === 'n') {
+    e.preventDefault()
+    createPage()
+    showToast('New page created')
+  }
+  if (e.ctrlKey && e.key === 's') {
+    e.preventDefault()
+    showToast('All changes saved')
+  }
+  if (e.key === 'Escape') {
+    closeCodeFusion()
+    closeAuthModal()
+    closeShareModal()
+    closeTemplatesModal()
+    closeTrashModal()
+    closeInboxModal()
+    closeEventModal()
+    closeShortcutsModal()
   }
 })
 

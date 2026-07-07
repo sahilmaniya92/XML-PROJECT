@@ -1,4 +1,5 @@
 import { getFilteredPages, getState } from '../utils/state.js'
+import { bindDropdown } from '../utils/dropdown.js'
 
 /**
  * Renders the Notion-style left sidebar.
@@ -15,11 +16,13 @@ export function renderSidebar(container, {
   onOpenTemplates,
   onOpenTrash,
   onOpenInbox,
+  onTogglePrivateSection,
 }) {
-  const { activePageId, searchQuery, activeView, user } = getState()
+  const { activePageId, searchQuery, activeView, user, privateSectionCollapsed } = getState()
   const pages = getFilteredPages()
   const favorites = pages.filter((page) => page.favorite)
   const privatePages = pages.filter((page) => !page.favorite)
+  const inboxCount = pages.length
 
   const renderPageButton = (page) => `
     <div class="sidebar-page-row">
@@ -51,11 +54,18 @@ export function renderSidebar(container, {
     </div>
   `
 
-  const renderSection = (title, items, collapsible = false) => {
+  const renderSection = (title, items, { collapsible = false, collapsed = false, onToggle } = {}) => {
     if (!items.length && !searchQuery) return ''
+    const toggleBtn = collapsible
+      ? `<button type="button" class="sidebar-section-toggle" data-action="toggle-section" aria-label="Toggle ${title}">${collapsed ? '▸' : '▾'}</button>`
+      : ''
     return `
-      <div class="sidebar-section ${collapsible ? 'sidebar-section-collapsible' : ''}">
-        <p class="sidebar-section-title">${title}</p>
+      <div class="sidebar-section ${collapsible ? 'sidebar-section-collapsible' : ''} ${collapsed ? 'is-collapsed' : ''}">
+        <div class="sidebar-section-head">
+          ${toggleBtn}
+          <p class="sidebar-section-title">${title}</p>
+          <span class="sidebar-section-count">${items.length}</span>
+        </div>
         <div class="sidebar-section-items">${items.map(renderPageButton).join('')}</div>
       </div>
     `
@@ -63,14 +73,22 @@ export function renderSidebar(container, {
 
   container.innerHTML = `
     <div class="sidebar-inner">
-      <div class="sidebar-workspace">
-        <button type="button" class="sidebar-workspace-btn" aria-label="Workspace menu">
+      <div class="sidebar-workspace sidebar-dropdown-wrap">
+        <button type="button" class="sidebar-workspace-btn" data-dropdown-toggle aria-label="Workspace menu">
           <span class="workspace-icon">T</span>
           <span class="sidebar-workspace-name">TaskScape</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sidebar-chevron">
             <path d="M6 9l6 6 6-6"/>
           </svg>
         </button>
+        <div class="app-dropdown-menu" data-dropdown-menu>
+          <button type="button" class="app-dropdown-item" data-dropdown-action="home">🏠 Home</button>
+          <button type="button" class="app-dropdown-item" data-dropdown-action="new-page">📄 New page</button>
+          <button type="button" class="app-dropdown-item" data-dropdown-action="templates">📋 Templates</button>
+          <button type="button" class="app-dropdown-item" data-dropdown-action="calendar">📅 Calendar Plus</button>
+          <button type="button" class="app-dropdown-item" data-dropdown-action="trash">🗑️ Trash</button>
+          <button type="button" class="app-dropdown-item" data-dropdown-action="auth">${user ? '👤 Account' : '🔐 Sign in'}</button>
+        </div>
       </div>
 
       <div class="sidebar-search-wrap">
@@ -94,6 +112,7 @@ export function renderSidebar(container, {
         <button type="button" class="sidebar-item" data-action="inbox">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sidebar-nav-icon"><path d="M22 12h-6l-2 3H10l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>
           <span>Inbox</span>
+          ${inboxCount ? `<span class="sidebar-badge">${inboxCount}</span>` : ''}
         </button>
         <button type="button" class="sidebar-item ${activeView === 'calendar' ? 'sidebar-item-active' : ''}" data-action="calendar-plus">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sidebar-nav-icon"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
@@ -102,7 +121,7 @@ export function renderSidebar(container, {
       </div>
 
       <div class="sidebar-scroll">
-        ${searchQuery ? renderSection('Search results', pages) : `${renderSection('Favorites', favorites)}${renderSection('Private', privatePages, true)}`}
+        ${searchQuery ? renderSection('Search results', pages) : `${renderSection('Favorites', favorites)}${renderSection('Private', privatePages, { collapsible: true, collapsed: privateSectionCollapsed })}`}
         ${pages.length === 0 ? '<p class="sidebar-empty">No pages found</p>' : ''}
       </div>
 
@@ -147,6 +166,24 @@ export function renderSidebar(container, {
       event.stopPropagation()
       onDeletePage(button.dataset.deleteId)
     })
+  })
+
+  container.querySelector('[data-action="toggle-section"]')?.addEventListener('click', onTogglePrivateSection)
+
+  bindDropdown(container, {
+    toggleSelector: '[data-dropdown-toggle]',
+    menuSelector: '[data-dropdown-menu]',
+    onSelect: (action) => {
+      const actions = {
+        home: onOpenHome,
+        'new-page': () => onNewPage(false),
+        templates: onOpenTemplates,
+        calendar: onOpenCalendarPlus,
+        trash: onOpenTrash,
+        auth: onOpenAuth,
+      }
+      actions[action]?.()
+    },
   })
 
   container.querySelector('[data-action="calendar-plus"]')?.addEventListener('click', onOpenCalendarPlus)

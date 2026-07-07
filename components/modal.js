@@ -108,6 +108,39 @@ export function renderShareModal(container, { open, page, onClose }) {
   })
 }
 
+export function renderShortcutsModal(container, { open, onClose }) {
+  if (!open) {
+    container.innerHTML = ''
+    return
+  }
+
+  container.innerHTML = `
+    <div class="app-modal-backdrop is-open" data-action="close-modal">
+      <div class="app-modal app-modal-sm" role="dialog" aria-label="Keyboard shortcuts">
+        <div class="app-modal-header">
+          <h2>Keyboard shortcuts</h2>
+          <button type="button" class="icon-btn" data-action="close-modal" aria-label="Close">×</button>
+        </div>
+        <div class="app-modal-body">
+          <ul class="shortcuts-list">
+            <li><kbd>/</kbd> Open block menu</li>
+            <li><kbd>Enter</kbd> New block</li>
+            <li><kbd>Backspace</kbd> Delete empty block</li>
+            <li><kbd>Ctrl</kbd>+<kbd>N</kbd> New page</li>
+            <li><kbd>Ctrl</kbd>+<kbd>S</kbd> Save (toast)</li>
+            <li><kbd>Esc</kbd> Close panels</li>
+          </ul>
+        </div>
+        <div class="app-modal-footer">
+          <button type="button" class="topbar-btn topbar-btn-primary" data-action="close-modal">Got it</button>
+        </div>
+      </div>
+    </div>
+  `
+
+  bindModalClose(container, onClose)
+}
+
 export function renderTemplatesModal(container, { open, onClose, onSelectTemplate }) {
   if (!open) {
     container.innerHTML = ''
