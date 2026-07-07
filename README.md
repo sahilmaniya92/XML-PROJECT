@@ -49,7 +49,8 @@ VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_your-key-here
 ```
 
 5. Restart the dev server: `npm run dev`
-6. Click **Sign in** in the sidebar to create an account and sync data
+6. In Supabase Dashboard → **SQL Editor**, run the schema in `supabase/schema.sql` (creates tables and security policies)
+7. Click **Sign in** in the sidebar to create an account and sync data
 
 > Without `.env`, the app still works locally — data saves to your browser via `localStorage`.
 

@@ -149,7 +149,7 @@ export function renderTemplatesModal(container, { open, onClose, onSelectTemplat
 
   const templates = [
     { id: 'meeting', icon: '📋', title: 'Meeting notes', content: '## Meeting notes\n\n**Date:** \n**Attendees:** \n\n### Agenda\n• \n\n### Notes\n\n### Action items\n☐ ' },
-    { id: 'tasks', icon: '✅', title: 'Task list', content: '## Tasks\n\n☐ High priority\n☐ In progress\n☐ Done' },
+    { id: 'tasks', icon: '✅', title: 'Task list', content: '## Tasks\n\n☐ Task 1\n☐ Task 2\n☐ Task 3' },
     { id: 'project', icon: '🚀', title: 'Project plan', content: '## Project overview\n\n### Goals\n• \n\n### Timeline\n• Phase 1\n• Phase 2\n\n### Resources\n' },
     { id: 'journal', icon: '📓', title: 'Daily journal', content: '## Today\n\n### Wins\n• \n\n### Challenges\n• \n\n### Tomorrow\n• ' },
   ]

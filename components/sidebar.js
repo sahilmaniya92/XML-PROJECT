@@ -7,6 +7,7 @@ import { bindDropdown } from '../utils/dropdown.js'
 export function renderSidebar(container, {
   onSelectPage,
   onNewPage,
+  onNewTaskList,
   onSearch,
   onToggleFavorite,
   onDeletePage,
@@ -84,6 +85,7 @@ export function renderSidebar(container, {
         <div class="app-dropdown-menu" data-dropdown-menu>
           <button type="button" class="app-dropdown-item" data-dropdown-action="home">🏠 Home</button>
           <button type="button" class="app-dropdown-item" data-dropdown-action="new-page">📄 New page</button>
+          <button type="button" class="app-dropdown-item" data-dropdown-action="new-task-list">✅ New task list</button>
           <button type="button" class="app-dropdown-item" data-dropdown-action="templates">📋 Templates</button>
           <button type="button" class="app-dropdown-item" data-dropdown-action="calendar">📅 Calendar Plus</button>
           <button type="button" class="app-dropdown-item" data-dropdown-action="trash">🗑️ Trash</button>
@@ -177,6 +179,7 @@ export function renderSidebar(container, {
       const actions = {
         home: onOpenHome,
         'new-page': () => onNewPage(false),
+        'new-task-list': onNewTaskList,
         templates: onOpenTemplates,
         calendar: onOpenCalendarPlus,
         trash: onOpenTrash,

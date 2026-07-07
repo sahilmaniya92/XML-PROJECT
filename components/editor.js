@@ -216,11 +216,10 @@ function buildEditorHtml(content) {
       blocks.push(
         `<div class="editor-block editor-callout" data-block="callout" contenteditable="true"><span class="callout-icon" contenteditable="false">💡</span><span class="callout-text">${escapeHtml(line.slice(2))}</span></div>`
       )
-    } else if (line.startsWith('☐ ') || line.startsWith('☑ ')) {
+    } else if (line.startsWith('☐') || line.startsWith('☑')) {
       const checked = line.startsWith('☑')
-      blocks.push(
-        `<div class="editor-block editor-todo ${checked ? 'is-checked' : ''}" data-block="todo" contenteditable="true">${escapeHtml(line)}</div>`
-      )
+      const taskText = line.replace(/^[☐☑]\s*/, '')
+      blocks.push(renderTodoBlock(taskText, checked))
     } else if (line.startsWith('• ')) {
       blocks.push(`<ul class="editor-block editor-bullet" data-block="bullet"><li contenteditable="true">${escapeHtml(line.slice(2))}</li></ul>`)
     } else if (/^\d+\.\s/.test(line)) {
@@ -236,6 +235,15 @@ function buildEditorHtml(content) {
   }
 
   return blocks.join('')
+}
+
+function renderTodoBlock(text, checked = false) {
+  const stateClass = checked ? 'is-checked' : ''
+  const label = checked ? 'Mark incomplete' : 'Mark complete'
+  return `<div class="editor-block editor-todo ${stateClass}" data-block="todo" contenteditable="false">
+    <span class="todo-checkbox ${stateClass}" contenteditable="false" role="checkbox" aria-checked="${checked}" aria-label="${label}" tabindex="0"></span>
+    <span class="todo-text" contenteditable="true">${escapeHtml(text)}</span>
+  </div>`
 }
 
 function escapeHtml(value) {

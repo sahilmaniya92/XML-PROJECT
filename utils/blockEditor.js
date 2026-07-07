@@ -6,8 +6,20 @@ export function attachBlockBehavior(contentEl, { onPersist }) {
   wrapBlocks(contentEl)
 
   contentEl.addEventListener('click', (event) => {
+    const checkbox = event.target.closest('.todo-checkbox')
+    if (checkbox) {
+      event.preventDefault()
+      event.stopPropagation()
+      const todo = checkbox.closest('[data-block="todo"]')
+      if (todo) {
+        toggleTodo(todo)
+        onPersist()
+      }
+      return
+    }
+
     const todo = event.target.closest('[data-block="todo"]')
-    if (!todo) return
+    if (!todo || todo.querySelector('.todo-checkbox')) return
 
     const text = todo.textContent
     if (text.startsWith('☐')) {
@@ -22,6 +34,17 @@ export function attachBlockBehavior(contentEl, { onPersist }) {
   })
 
   contentEl.addEventListener('keydown', (event) => {
+    const checkbox = event.target.closest('.todo-checkbox')
+    if (checkbox && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault()
+      const todo = checkbox.closest('[data-block="todo"]')
+      if (todo) {
+        toggleTodo(todo)
+        onPersist()
+      }
+      return
+    }
+
     if (event.key === 'Enter' && !event.shiftKey) {
       const slashOpen = document.querySelector('.slash-menu:not(.hidden)')
       if (slashOpen) return
@@ -31,7 +54,7 @@ export function attachBlockBehavior(contentEl, { onPersist }) {
       if (!block) return
 
       const outer = block.closest('.block-outer')
-      const newBlock = createTextBlock()
+      const newBlock = block.dataset.block === 'todo' ? createTodoBlock() : createTextBlock()
       if (outer) {
         outer.after(newBlock)
       } else {
@@ -76,7 +99,8 @@ export function attachBlockBehavior(contentEl, { onPersist }) {
     if (!outer) return
 
     if (addBtn) {
-      const newBlock = createTextBlock()
+      const currentBlock = outer.querySelector('.block-content > .editor-block')
+      const newBlock = currentBlock?.dataset.block === 'todo' ? createTodoBlock() : createTextBlock()
       outer.after(newBlock)
       wrapBlocks(contentEl)
       focusBlock(newBlock.querySelector('.editor-block') ?? newBlock)
@@ -177,6 +201,35 @@ export function createTextBlock() {
   return outer
 }
 
+export function createTodoBlock() {
+  const outer = document.createElement('div')
+  outer.className = 'block-outer'
+  outer.innerHTML = `
+    <div class="block-gutter" contenteditable="false">
+      <button type="button" class="block-btn block-btn-add" data-action="block-add" aria-label="Add block">+</button>
+      <button type="button" class="block-btn block-btn-handle" data-action="block-handle" aria-label="Drag handle">⠿</button>
+    </div>
+    <div class="block-content">
+      <div class="editor-block editor-todo" data-block="todo" contenteditable="false">
+        <span class="todo-checkbox" contenteditable="false" role="checkbox" aria-checked="false" aria-label="Mark complete" tabindex="0"></span>
+        <span class="todo-text" contenteditable="true"></span>
+      </div>
+    </div>
+  `
+  return outer
+}
+
+function toggleTodo(todo) {
+  const checked = !todo.classList.contains('is-checked')
+  todo.classList.toggle('is-checked', checked)
+  const checkbox = todo.querySelector('.todo-checkbox')
+  if (checkbox) {
+    checkbox.classList.toggle('is-checked', checked)
+    checkbox.setAttribute('aria-checked', String(checked))
+    checkbox.setAttribute('aria-label', checked ? 'Mark incomplete' : 'Mark complete')
+  }
+}
+
 function getCurrentBlock() {
   const selection = window.getSelection()
   if (!selection || selection.rangeCount === 0) return null
@@ -187,6 +240,8 @@ function getCurrentBlock() {
 }
 
 function getBlockText(block) {
+  const todoText = block.querySelector('.todo-text')
+  if (todoText) return todoText.innerText.replace(/\n/g, '').trim()
   return block.innerText.replace(/\n/g, '').trim()
 }
 
@@ -228,7 +283,7 @@ export function serializeBlocks(contentEl) {
 
     const type = block.dataset.block
     const text = block.innerText.trim()
-    if (!text) return
+    if (!text && type !== 'todo') return
 
     switch (type) {
       case 'h1':
@@ -243,9 +298,17 @@ export function serializeBlocks(contentEl) {
       case 'quote':
         lines.push(`> ${text}`)
         break
-      case 'todo':
-        lines.push(text)
+      case 'todo': {
+        const textEl = block.querySelector('.todo-text')
+        if (textEl) {
+          const taskText = textEl.innerText.trim()
+          const mark = block.classList.contains('is-checked') ? '☑' : '☐'
+          lines.push(taskText ? `${mark} ${taskText}` : `${mark} `)
+        } else {
+          lines.push(text)
+        }
         break
+      }
       case 'bullet': {
         const items = [...block.querySelectorAll('li')].map((li) => li.innerText.trim()).filter(Boolean)
         items.forEach((item) => lines.push(`• ${item}`))

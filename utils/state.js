@@ -368,6 +368,12 @@ export function resetToLocalDefaults() {
   notify()
 }
 
+export const TASK_LIST_TEMPLATE = {
+  icon: '✅',
+  title: 'Task list',
+  content: '## Tasks\n\n☐ Task 1\n☐ Task 2\n☐ Task 3',
+}
+
 export function createPage(template) {
   const id = `page-${Date.now()}`
   const newPage = {

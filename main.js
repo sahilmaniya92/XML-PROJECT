@@ -31,6 +31,7 @@ import {
   toggleCodeFusion,
   closeCodeFusion,
   createPage,
+  TASK_LIST_TEMPLATE,
   updateActivePage,
   deletePage,
   restorePage,
@@ -237,6 +238,11 @@ function renderApp() {
       } else {
         showToast('New page created')
       }
+    },
+    onNewTaskList: () => {
+      closeCalendarPlus()
+      createPage(TASK_LIST_TEMPLATE)
+      showToast('Task list created')
     },
     onSearch: setSearchQuery,
     onToggleFavorite: toggleFavorite,
