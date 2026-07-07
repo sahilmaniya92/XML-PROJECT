@@ -763,10 +763,59 @@ body {
 }
 
 .editor-todo {
-  padding-left: 2px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 4px 0;
+  user-select: none;
 }
 
-.editor-todo.is-checked {
+.todo-checkbox {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  border: 2px solid #787774;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.todo-checkbox:hover {
+  border-color: var(--color-codefusion);
+  background: #faf9ff;
+}
+
+.todo-checkbox.is-checked {
+  background: var(--color-codefusion);
+  border-color: var(--color-codefusion);
+}
+
+.todo-checkbox.is-checked::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 5px;
+  height: 10px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.todo-text {
+  flex: 1;
+  min-width: 0;
+  outline: none;
+  user-select: text;
+  padding-top: 1px;
+  min-height: 1.4em;
+}
+
+.editor-todo.is-checked .todo-text {
   color: var(--color-muted);
   text-decoration: line-through;
 }

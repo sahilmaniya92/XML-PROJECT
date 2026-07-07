@@ -39,7 +39,10 @@ const BLOCK_HTML = {
   h3: '<h3 class="editor-block editor-h3" data-block="h3" contenteditable="true">Heading 3</h3>',
   bullet: '<ul class="editor-block editor-bullet" data-block="bullet"><li contenteditable="true">List item</li></ul>',
   number: '<ol class="editor-block editor-number" data-block="number"><li contenteditable="true">List item</li></ol>',
-  todo: '<div class="editor-block editor-todo" data-block="todo" contenteditable="true">☐ To-do</div>',
+  todo: `<div class="editor-block editor-todo" data-block="todo" contenteditable="false">
+    <span class="todo-checkbox" contenteditable="false" role="checkbox" aria-checked="false" aria-label="Mark complete" tabindex="0"></span>
+    <span class="todo-text" contenteditable="true">To-do</span>
+  </div>`,
   toggle:
     '<details class="editor-block editor-toggle" data-block="toggle"><summary contenteditable="true">Toggle heading</summary><div class="editor-toggle-body" contenteditable="true"><p><br></p></div></details>',
   quote: '<blockquote class="editor-block editor-quote" data-block="quote" contenteditable="true">Quote</blockquote>',
