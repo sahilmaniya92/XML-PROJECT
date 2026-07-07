@@ -11,20 +11,21 @@ Data saves in **browser localStorage**. Sign in to sync one JSON row to **Supaba
 4. **Assignments** → Kanban board: To do → In progress → Done.
 5. **Sign in** (optional) → same data copies to Supabase `workspaces` table.
 
-No AI assistant in this version — just plain JS screens and local data.
+**AI (Epic 4)** → sidebar screen exists; full chat is a **whole-team** task (Gemini later).
 
 ## Epic coverage
 
-| Epic | Feature | Sidebar |
-|------|---------|---------|
-| 1 | Profile, Google sign-in, syllabus parse | Profile |
-| 2 | Today's dashboard, progress | **Today** |
-| 3 | Rich notes + course/lecture link | Notes list |
-| 5 | Assignment Kanban | **Assignments** |
-| 6 | Weekly study plan generator | **Study planner** |
-| 7 | Flashcards + spaced repetition | **Flashcards** |
-| 8 | One-click exam prep | **Exam prep** |
-| 9 | Study hours chart | **Analytics** |
+| Epic | Feature | Sidebar | Owner |
+|------|---------|---------|-------|
+| 1 | Profile, Google sign-in, syllabus parse | Profile | Dhruv |
+| 2 | Today's dashboard, progress | **Today** | Dhruv |
+| 3 | Rich notes + course/lecture link | Notes list | Parth |
+| 4 | AI assistant (UI shell) | **AI** | **Whole team** |
+| 5 | Assignment Kanban | **Assignments** | Kelvin |
+| 6 | Weekly study plan generator | **Study planner** | Kelvin |
+| 7 | Flashcards + spaced repetition | **Flashcards** | Parth |
+| 8 | One-click exam prep | **Exam prep** | Sahil |
+| 9 | Study hours chart | **Analytics** | Sahil |
 
 ## Team READMEs
 
@@ -45,6 +46,7 @@ No AI assistant in this version — just plain JS screens and local data.
 | **Parth** | Notes linked to course + lecture | **xml/Js — XML & JavaScript lecture** |
 | **Sahil** | Exam prep from open note | **Exam prep** → activate |
 | **Kelvin** | Kanban assignment tracking | **Assignments** → move cards |
+| **All** | AI section (shell) | **AI** → coming soon |
 
 > First open loads demo data (lecture note, today's events, assignments).
 

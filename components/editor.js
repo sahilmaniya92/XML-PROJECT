@@ -2,6 +2,7 @@ import { attachSlashMenu, renderCalendarMiniBlock } from '../utils/slashMenu.js'
 import { attachBlockBehavior, wrapBlocks, serializeBlocks } from '../utils/blockEditor.js'
 import { COVER_GRADIENTS, getCoverCss } from '../utils/covers.js'
 import { COURSES } from '../utils/courses.js'
+import { escapeHtml, escapeAttr } from '../utils/shared.js'
 
 const PAGE_ICONS = ['📝', '📋', '✅', '📌', '🎯', '💡', '📚', '🗂️', '⭐', '🔥', '📄', '🚀', '📅', '🎨', '💼', '🔖']
 
@@ -279,16 +280,4 @@ function renderTodoBlock(text, checked = false) {
     <span class="todo-checkbox ${stateClass}" contenteditable="false" role="checkbox" aria-checked="${checked}" aria-label="${label}" tabindex="0"></span>
     <span class="todo-text" contenteditable="true">${escapeHtml(text)}</span>
   </div>`
-}
-
-function escapeHtml(value) {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-}
-
-function escapeAttr(value) {
-  return escapeHtml(value ?? '').replaceAll("'", '&#39;')
 }

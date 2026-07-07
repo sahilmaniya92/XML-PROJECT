@@ -14,7 +14,7 @@ export function renderAi(container, { onBack }) {
         <div class="ws-ai-empty">
           <span class="ws-ai-icon">✦</span>
           <h2>AI assistant</h2>
-          <p>This section is reserved for Sahil's Epic 4 work. For now it does nothing — no API, no chat history.</p>
+          <p>This section is a <strong>shared team feature</strong> (Epic 4). UI shell is in place — full Gemini + note search will be wired by everyone together.</p>
           <p class="ws-muted">When ready: grounded answers from your lecture notes using Gemini.</p>
         </div>
 

@@ -31,4 +31,10 @@
 
 ---
 
+## Shared — Epic 4 AI (whole team)
+
+**AI assistant** → Sidebar → **AI** — placeholder UI done; backend + Gemini integration is **shared across the team**.
+
+---
+
 [← Main README](./README.md)

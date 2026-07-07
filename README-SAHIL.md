@@ -25,4 +25,17 @@
 
 ---
 
+## Shared — Epic 4 AI (whole team)
+
+| | |
+|---|---|
+| **Epic** | 4 (AI) |
+| **Status** | UI shell done — chat/API wired by **all teammates** |
+
+**Show in demo:** Sidebar → **AI** → explain coming soon screen and team plan for Gemini + note search.
+
+**Files:** `components/ai.js`, `main.js`, `utils/state.js`
+
+---
+
 [← Main README](./README.md)

@@ -39,4 +39,10 @@
 
 ---
 
+## Shared — Epic 4 AI (whole team)
+
+**AI assistant** → Sidebar → **AI** — UI shell in `components/ai.js`; full feature is a **team effort** (notes context, API, UI).
+
+---
+
 [← Main README](./README.md)

@@ -33,4 +33,10 @@
 
 ---
 
+## Shared — Epic 4 AI (whole team)
+
+**AI assistant** → Sidebar → **AI** (UI shell done; Gemini + note search — team builds together)
+
+---
+
 [← Main README](./README.md)

@@ -11,11 +11,11 @@ Last updated: July 7, 2026
 |--------|-------|---------|
 | ✅ **Demo-ready** | **4** | One polished story per teammate — works for professor demo |
 | 🟡 **Basic / partial** | **4** | Screen exists and does something simple, not fully polished |
-| ⬜ **Placeholder only** | **1** | UI shell only — Epic 4 AI |
+| ⬜ **Placeholder (team)** | **1** | UI shell in place — Epic 4 AI built by **whole team** |
 
 **Coverage score (honest)**
 
-- Epics with a working screen: **8 / 9** (only AI is empty)
+- Epics with a working screen: **9 / 9** (AI has placeholder UI)
 - Epics demo-ready for presentation: **~4–5 / 9**
 - One story per teammate ready: **4 / 4** (Dhruv, Parth, Kelvin, Sahil via Exam prep)
 
@@ -33,7 +33,9 @@ Last updated: July 7, 2026
 | **Kelvin Idoko** | N01777723 | 6 | Weekly study planner | 🟡 **Partial** |
 | **Sahil Maniya** | N01769967 | 8 | One-click exam prep | 🟡 **Partial** |
 | **Sahil Maniya** | N01769967 | 9 | Study analytics | 🟡 **Partial** |
-| **Sahil Maniya** | N01769967 | 4 | AI answers from notes | ⬜ **Placeholder** |
+| **Whole team** | — | 4 | AI answers from notes | ⬜ **Placeholder** (shared) |
+
+> **Epic 4 (AI)** is not owned by one person — **Dhruv, Parth, Sahil, and Kelvin** all contribute.
 
 ---
 
@@ -45,6 +47,7 @@ Last updated: July 7, 2026
 | **Parth** | Notes linked to course + lecture | **xml/Js — XML & JavaScript lecture** |
 | **Sahil** | Exam prep from open note | **Exam prep** → Activate |
 | **Kelvin** | Kanban assignment tracking | **Assignments** → move cards |
+| **All** | AI section (shell only) | **AI** → coming soon screen |
 
 > First open loads demo data (lecture note, today's events, assignments).
 
@@ -103,13 +106,21 @@ Last updated: July 7, 2026
 
 ---
 
-### ⬜ Placeholder only
+### ⬜ Placeholder — whole team (Epic 4)
 
 #### Epic 4 — AI (`AI`)
-- Sidebar link exists
-- "Coming soon" screen — input and send button disabled
-- No API, no chat history, no RAG
-- **Owner:** Sahil — `components/ai.js` (to be wired later with Gemini)
+- Sidebar link + screen layout done
+- "Coming soon" UI — input and send button disabled for now
+- No API, no chat history, no RAG yet
+- **Owners:** **Whole team** — `components/ai.js`, routing in `main.js` / `state.js`
+- **Planned:** grounded answers from lecture notes using Gemini (team builds together)
+
+| Teammate | Likely contribution |
+|----------|---------------------|
+| Dhruv | Auth + API keys, sync chat to Supabase |
+| Parth | Note indexing, course/lecture context for prompts |
+| Sahil | Gemini API integration, prompt design |
+| Kelvin | UI polish, loading states, error handling |
 
 ---
 
@@ -128,23 +139,22 @@ Last updated: July 7, 2026
 
 - Vanilla JavaScript + Vite + Tailwind v4
 - Data: `localStorage` + optional Supabase (`workspaces` table, JSON `data` column)
-- No external AI API connected yet
+- No external AI API connected yet (Epic 4 — team task)
 
 ---
 
 ## What to tell the professor
 
-> "We mapped **9 epics** to the app. **4 user stories are demo-ready** (Today dashboard, linked notes, Kanban assignments, and exam/flashcard flow). **Epic 4 AI is a placeholder** for later. The rest are working prototypes with simple vanilla JS — no external AI API yet."
+> "We mapped **9 epics** to the app. **4 user stories are demo-ready** (Today dashboard, linked notes, Kanban assignments, and exam/flashcard flow). **Epic 4 AI** has the UI shell in the sidebar — the whole team will wire Gemini + note search together. The rest are working prototypes with simple vanilla JS."
 
 ---
 
 ## Next steps (suggested)
 
-- [ ] Wire Epic 4 AI (Gemini + note search) — Sahil
+- [ ] Wire Epic 4 AI (Gemini + note search) — **whole team**
 - [ ] Fix flashcard duplicate generation — Parth
 - [ ] Polish study planner (edit sessions) — Kelvin
 - [ ] Remove or simplify CodeFusion legacy panel
-- [ ] Update main README to link this tracker
 
 ---
 
