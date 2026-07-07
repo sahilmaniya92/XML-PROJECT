@@ -1,205 +1,135 @@
-import { getFilteredPages, getState } from '../utils/state.js'
-import { bindDropdown } from '../utils/dropdown.js'
+import { getFilteredPages, getState, getDueFlashcards } from '../utils/state.js'
 
-/**
- * Renders the Notion-style left sidebar.
- */
-export function renderSidebar(container, {
-  onSelectPage,
-  onNewPage,
-  onSearch,
-  onToggleFavorite,
-  onDeletePage,
-  onOpenCalendarPlus,
-  onOpenHome,
-  onOpenAuth,
-  onOpenTemplates,
-  onOpenTrash,
-  onOpenInbox,
-  onTogglePrivateSection,
-}) {
-  const { activePageId, searchQuery, activeView, user, privateSectionCollapsed } = getState()
+const NAV = [
+  { section: 'Workspace' },
+  { id: 'home', label: 'Today', icon: navIcon('today') },
+  { section: 'Academics' },
+  { id: 'assignments', label: 'Assignments', icon: navIcon('board') },
+  { id: 'planner', label: 'Study planner', icon: navIcon('plan') },
+  { id: 'flashcards', label: 'Flashcards', icon: navIcon('cards'), badge: 'due' },
+  { id: 'exam', label: 'Exam prep', icon: navIcon('exam') },
+  { section: 'Tools' },
+  { id: 'ai', label: 'AI', icon: navIcon('chat') },
+  { id: 'analytics', label: 'Analytics', icon: navIcon('chart') },
+  { id: 'calendar', label: 'Calendar', icon: navIcon('cal') },
+]
+
+export function renderSidebar(container, handlers) {
+  const state = getState()
+  const { activePageId, searchQuery, activeView, user, privateSectionCollapsed } = state
   const pages = getFilteredPages()
-  const favorites = pages.filter((page) => page.favorite)
-  const privatePages = pages.filter((page) => !page.favorite)
-  const inboxCount = pages.length
-
-  const renderPageButton = (page) => `
-    <div class="sidebar-page-row">
-      <button
-        type="button"
-        class="sidebar-item ${page.id === activePageId && activeView === 'page' ? 'sidebar-item-active' : ''}"
-        data-page-id="${page.id}"
-        aria-label="Open ${page.title}"
-      >
-        <span class="sidebar-page-icon">${page.icon}</span>
-        <span class="sidebar-page-title">${escapeHtml(page.title)}</span>
-      </button>
-      <div class="sidebar-page-actions">
-        <button
-          type="button"
-          class="sidebar-mini-btn"
-          data-favorite-id="${page.id}"
-          aria-label="${page.favorite ? 'Remove from favorites' : 'Add to favorites'}"
-          title="${page.favorite ? 'Unfavorite' : 'Favorite'}"
-        >${page.favorite ? '★' : '☆'}</button>
-        <button
-          type="button"
-          class="sidebar-mini-btn sidebar-mini-btn-danger"
-          data-delete-id="${page.id}"
-          aria-label="Delete page"
-          title="Delete"
-        >×</button>
-      </div>
-    </div>
-  `
-
-  const renderSection = (title, items, { collapsible = false, collapsed = false, onToggle } = {}) => {
-    if (!items.length && !searchQuery) return ''
-    const toggleBtn = collapsible
-      ? `<button type="button" class="sidebar-section-toggle" data-action="toggle-section" aria-label="Toggle ${title}">${collapsed ? '▸' : '▾'}</button>`
-      : ''
-    return `
-      <div class="sidebar-section ${collapsible ? 'sidebar-section-collapsible' : ''} ${collapsed ? 'is-collapsed' : ''}">
-        <div class="sidebar-section-head">
-          ${toggleBtn}
-          <p class="sidebar-section-title">${title}</p>
-          <span class="sidebar-section-count">${items.length}</span>
-        </div>
-        <div class="sidebar-section-items">${items.map(renderPageButton).join('')}</div>
-      </div>
-    `
-  }
+  const favorites = pages.filter((p) => p.favorite)
+  const otherPages = pages.filter((p) => !p.favorite)
+  const dueCount = getDueFlashcards('All').length
 
   container.innerHTML = `
-    <div class="sidebar-inner">
-      <div class="sidebar-workspace sidebar-dropdown-wrap">
-        <button type="button" class="sidebar-workspace-btn" data-dropdown-toggle aria-label="Workspace menu">
-          <span class="workspace-icon">T</span>
-          <span class="sidebar-workspace-name">TaskScape</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sidebar-chevron">
-            <path d="M6 9l6 6 6-6"/>
-          </svg>
-        </button>
-        <div class="app-dropdown-menu" data-dropdown-menu>
-          <button type="button" class="app-dropdown-item" data-dropdown-action="home">🏠 Home</button>
-          <button type="button" class="app-dropdown-item" data-dropdown-action="new-page">📄 New page</button>
-          <button type="button" class="app-dropdown-item" data-dropdown-action="templates">📋 Templates</button>
-          <button type="button" class="app-dropdown-item" data-dropdown-action="calendar">📅 Calendar Plus</button>
-          <button type="button" class="app-dropdown-item" data-dropdown-action="trash">🗑️ Trash</button>
-          <button type="button" class="app-dropdown-item" data-dropdown-action="auth">${user ? '👤 Account' : '🔐 Sign in'}</button>
+    <div class="sw-sidebar">
+      <div class="sw-brand">
+        <span class="sw-brand-mark">SW</span>
+        <div class="sw-brand-text">
+          <span class="sw-brand-name">Student Workspace</span>
+          <span class="sw-brand-sub">${user ? escape(user.email?.split('@')[0]) : 'Not signed in'}</span>
         </div>
       </div>
 
-      <div class="sidebar-search-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sidebar-search-icon">
-          <circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/>
-        </svg>
-        <input
-          type="search"
-          class="sidebar-search"
-          placeholder="Search"
-          value="${escapeHtml(searchQuery)}"
-          aria-label="Search pages"
-        />
+      <div class="sw-search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/></svg>
+        <input type="search" class="sw-search-input" placeholder="Search notes…" value="${escape(searchQuery)}" />
       </div>
 
-      <div class="sidebar-quick-links">
-        <button type="button" class="sidebar-item ${activeView === 'home' ? 'sidebar-item-active' : ''}" data-action="home">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sidebar-nav-icon"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1V9.5z"/></svg>
-          <span>Home</span>
-        </button>
-        <button type="button" class="sidebar-item" data-action="inbox">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sidebar-nav-icon"><path d="M22 12h-6l-2 3H10l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>
-          <span>Inbox</span>
-          ${inboxCount ? `<span class="sidebar-badge">${inboxCount}</span>` : ''}
-        </button>
-        <button type="button" class="sidebar-item ${activeView === 'calendar' ? 'sidebar-item-active' : ''}" data-action="calendar-plus">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sidebar-nav-icon"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-          <span>Calendar Plus</span>
-        </button>
+      <nav class="sw-nav">
+        ${NAV.map((item) => {
+          if (item.section) return `<p class="sw-nav-label">${item.section}</p>`
+          const active = activeView === item.id || (item.id === 'home' && activeView === 'home')
+          const badge = item.badge === 'due' && dueCount ? `<span class="sw-badge">${dueCount}</span>` : ''
+          return `
+          <button type="button" class="sw-nav-item ${active ? 'is-active' : ''}" data-view="${item.id}">
+            ${item.icon}
+            <span>${item.label}</span>
+            ${badge}
+          </button>`
+        }).join('')}
+      </nav>
+
+      <div class="sw-notes">
+        <p class="sw-nav-label">Notes</p>
+        <div class="sw-notes-list">
+          ${[...favorites, ...otherPages]
+            .slice(0, searchQuery ? 20 : 12)
+            .map(pageRow(activePageId, activeView))
+            .join('') || '<p class="sw-empty">No notes</p>'}
+        </div>
       </div>
 
-      <div class="sidebar-scroll">
-        ${searchQuery ? renderSection('Search results', pages) : `${renderSection('Favorites', favorites)}${renderSection('Private', privatePages, { collapsible: true, collapsed: privateSectionCollapsed })}`}
-        ${pages.length === 0 ? '<p class="sidebar-empty">No pages found</p>' : ''}
-      </div>
-
-      <div class="sidebar-footer">
-        <button type="button" class="sidebar-auth-btn" data-action="auth">
-          <span class="sidebar-auth-avatar">${user ? user.email?.[0]?.toUpperCase() ?? 'U' : '👤'}</span>
-          <span class="sidebar-auth-label">${user ? 'Account' : 'Sign in'}</span>
+      <footer class="sw-footer">
+        <button type="button" class="sw-footer-btn" data-action="profile">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+          Profile
         </button>
-        <button type="button" class="sidebar-new-page" data-action="new-page">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sidebar-nav-icon"><path d="M12 5v14M5 12h14"/></svg>
-          <span>New page</span>
+        <button type="button" class="sw-footer-btn" data-action="new-page">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          New note
         </button>
-        <button type="button" class="sidebar-footer-link" data-action="templates">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sidebar-nav-icon"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
-          <span>Templates</span>
-        </button>
-        <button type="button" class="sidebar-footer-link" data-action="trash">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sidebar-nav-icon"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
-          <span>Trash</span>
-        </button>
-      </div>
+        <button type="button" class="sw-footer-btn" data-action="auth">${user ? 'Account' : 'Sign in'}</button>
+        ${user ? '<button type="button" class="sw-footer-btn sw-footer-muted" data-action="sign-out">Sign out</button>' : ''}
+      </footer>
     </div>
   `
 
-  container.querySelector('.sidebar-search')?.addEventListener('input', (event) => {
-    onSearch(event.target.value)
+  container.querySelector('.sw-search-input')?.addEventListener('input', (e) => handlers.onSearch(e.target.value))
+
+  const viewMap = {
+    home: handlers.onOpenHome,
+    assignments: handlers.onOpenAssignments,
+    planner: handlers.onOpenPlanner,
+    flashcards: handlers.onOpenFlashcards,
+    exam: handlers.onOpenExam,
+    ai: handlers.onOpenAi,
+    analytics: handlers.onOpenAnalytics,
+    calendar: handlers.onOpenCalendarPlus,
+  }
+
+  container.querySelectorAll('[data-view]').forEach((btn) => {
+    btn.addEventListener('click', () => viewMap[btn.dataset.view]?.())
   })
 
-  container.querySelectorAll('[data-page-id]').forEach((button) => {
-    button.addEventListener('click', () => onSelectPage(button.dataset.pageId))
+  container.querySelectorAll('[data-page-id]').forEach((btn) => {
+    btn.addEventListener('click', () => handlers.onSelectPage(btn.dataset.pageId))
   })
 
-  container.querySelectorAll('[data-favorite-id]').forEach((button) => {
-    button.addEventListener('click', (event) => {
-      event.stopPropagation()
-      onToggleFavorite(button.dataset.favoriteId)
-    })
-  })
-
-  container.querySelectorAll('[data-delete-id]').forEach((button) => {
-    button.addEventListener('click', (event) => {
-      event.stopPropagation()
-      onDeletePage(button.dataset.deleteId)
-    })
-  })
-
-  container.querySelector('[data-action="toggle-section"]')?.addEventListener('click', onTogglePrivateSection)
-
-  bindDropdown(container, {
-    toggleSelector: '[data-dropdown-toggle]',
-    menuSelector: '[data-dropdown-menu]',
-    onSelect: (action) => {
-      const actions = {
-        home: onOpenHome,
-        'new-page': () => onNewPage(false),
-        templates: onOpenTemplates,
-        calendar: onOpenCalendarPlus,
-        trash: onOpenTrash,
-        auth: onOpenAuth,
-      }
-      actions[action]?.()
-    },
-  })
-
-  container.querySelector('[data-action="calendar-plus"]')?.addEventListener('click', onOpenCalendarPlus)
-  container.querySelector('[data-action="home"]')?.addEventListener('click', onOpenHome)
-  container.querySelector('[data-action="inbox"]')?.addEventListener('click', onOpenInbox)
-  container.querySelector('[data-action="templates"]')?.addEventListener('click', onOpenTemplates)
-  container.querySelector('[data-action="trash"]')?.addEventListener('click', onOpenTrash)
-  container.querySelector('[data-action="auth"]')?.addEventListener('click', onOpenAuth)
-
-  container.querySelectorAll('[data-action="new-page"]').forEach((button) => {
-    button.addEventListener('click', () => onNewPage(false))
-  })
+  container.querySelector('[data-action="profile"]')?.addEventListener('click', handlers.onOpenProfile)
+  container.querySelector('[data-action="new-page"]')?.addEventListener('click', () => handlers.onNewPage(false))
+  container.querySelector('[data-action="auth"]')?.addEventListener('click', handlers.onOpenAuth)
+  container.querySelector('[data-action="sign-out"]')?.addEventListener('click', () => handlers.onSignOut?.())
 }
 
-function escapeHtml(value) {
-  return value
+function pageRow(activePageId, activeView) {
+  return (page) => `
+    <button type="button" class="sw-note-item ${page.id === activePageId && activeView === 'page' ? 'is-active' : ''}" data-page-id="${page.id}">
+      <span class="sw-note-icon">${page.icon || '📄'}</span>
+      <span class="sw-note-text">
+        <span class="sw-note-title">${escape(page.title)}</span>
+        ${page.course ? `<span class="sw-note-course">${escape(page.course.split(' — ')[0])}</span>` : ''}
+      </span>
+    </button>`
+}
+
+function navIcon(type) {
+  const icons = {
+    today: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01"/></svg>',
+    board: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="12" rx="1"/><rect x="17" y="3" width="4" height="15" rx="1"/></svg>',
+    plan: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h10M4 18h6"/></svg>',
+    cards: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h6"/></svg>',
+    exam: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 4v6c0 5-4 8-9 8s-9-3-9-8V7l9-4z"/></svg>',
+    chat: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a4 4 0 01-4 4H8l-5 3V7a4 4 0 014-4h10a4 4 0 014 4z"/></svg>',
+    chart: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M10 19V9M16 19v-6M22 19V3"/></svg>',
+    cal: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+  }
+  return icons[type] ?? ''
+}
+
+function escape(v) {
+  return String(v ?? '')
     .replaceAll('&', '&amp;')
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')

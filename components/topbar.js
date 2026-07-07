@@ -8,6 +8,9 @@ export function renderTopbar(container, {
   activePage,
   activeView,
   syncStatus,
+  dbStatus,
+  syncError,
+  lastSyncedAt,
   user,
   onToggleSidebar,
   onToggleMobileSidebar,
@@ -16,6 +19,9 @@ export function renderTopbar(container, {
   onSave,
   onShare,
   onOpenAuth,
+  onOpenDbSetup,
+  onForceSync,
+  onShowSyncError,
   onOpenHome,
   onDuplicatePage,
   onDeletePage,
@@ -37,9 +43,23 @@ export function renderTopbar(container, {
         ? 'Synced'
         : syncStatus === 'error'
           ? 'Sync error'
-          : user
-            ? 'Cloud'
-            : 'Local'
+          : dbStatus === 'missing_table'
+            ? 'Setup DB'
+            : dbStatus === 'connected' && user
+              ? 'Cloud'
+              : user
+                ? 'Local'
+                : 'Sign in'
+
+  const syncTitle = syncError
+    ? syncError
+    : lastSyncedAt
+      ? `Last saved to database: ${new Date(lastSyncedAt).toLocaleTimeString()}`
+      : user
+        ? user.email
+        : dbStatus === 'missing_table'
+          ? 'Database table missing — click for setup guide'
+          : 'Sign in to sync with Supabase'
 
   container.innerHTML = `
     <div class="topbar">
@@ -66,9 +86,9 @@ export function renderTopbar(container, {
       <div class="topbar-right">
         <button
           type="button"
-          class="sync-pill sync-pill-${syncStatus}"
-          data-action="auth"
-          title="${user ? user.email : 'Sign in to sync with Supabase'}"
+          class="sync-pill sync-pill-${syncStatus === 'error' || dbStatus === 'missing_table' ? 'error' : syncStatus}"
+          data-action="sync-pill"
+          title="${escapeHtml(syncTitle)}"
         >
           <span class="sync-dot"></span>
           ${syncLabel}
@@ -130,7 +150,18 @@ export function renderTopbar(container, {
   container.querySelector('[data-action="save"]')?.addEventListener('click', onSave)
   container.querySelector('[data-action="favorite"]')?.addEventListener('click', onToggleFavorite)
   container.querySelector('[data-action="share"]')?.addEventListener('click', onShare)
-  container.querySelector('[data-action="auth"]')?.addEventListener('click', onOpenAuth)
+  container.querySelector('[data-action="sync-pill"]')?.addEventListener('click', () => {
+    if (syncStatus === 'error' && syncError) {
+      onShowSyncError?.(syncError)
+    }
+    if (dbStatus === 'missing_table' || dbStatus === 'permission') {
+      onOpenDbSetup?.()
+    } else if (user) {
+      onForceSync?.()
+    } else {
+      onOpenAuth?.()
+    }
+  })
   container.querySelector('[data-action="go-home"]')?.addEventListener('click', onOpenHome)
 
   bindDropdown(container, {

@@ -89,6 +89,13 @@ export function loadCalendarEvents(events) {
   }
 }
 
+export function loadCalendarState({ events, month, year, selectedDateKey: dateKey }) {
+  if (Array.isArray(events)) calendarEvents = structuredClone(events)
+  if (typeof month === 'number') calendarMonth = month
+  if (typeof year === 'number') calendarYear = year
+  if (dateKey) selectedDateKey = dateKey
+}
+
 export function formatDateKey(date) {
   const y = date.getFullYear()
   const m = String(date.getMonth() + 1).padStart(2, '0')

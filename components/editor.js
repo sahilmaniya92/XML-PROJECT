@@ -1,6 +1,7 @@
 import { attachSlashMenu, renderCalendarMiniBlock } from '../utils/slashMenu.js'
 import { attachBlockBehavior, wrapBlocks, serializeBlocks } from '../utils/blockEditor.js'
 import { COVER_GRADIENTS, getCoverCss } from '../utils/covers.js'
+import { COURSES } from '../utils/courses.js'
 
 const PAGE_ICONS = ['📝', '📋', '✅', '📌', '🎯', '💡', '📚', '🗂️', '⭐', '🔥', '📄', '🚀', '📅', '🎨', '💼', '🔖']
 
@@ -22,7 +23,12 @@ export function renderEditor(container, { activePage, onUpdatePage, onOpenCodeFu
         <button type="button" class="editor-cover-btn editor-cover-btn-reposition" data-action="reposition-cover">Reposition</button>
       </div>
 
-      <div class="editor-page ${hasCover ? '' : 'editor-page-no-cover'}">
+        <div class="editor-page ${hasCover ? '' : 'editor-page-no-cover'}">
+        ${
+          activePage.course
+            ? `<p class="editor-story-hint">Linked to <strong>${escapeHtml(activePage.course)}</strong>${activePage.lecture ? ` · ${escapeHtml(activePage.lecture)}` : ''}</p>`
+            : ''
+        }
         <div class="editor-icon-row">
           <button type="button" class="editor-icon-btn" data-action="change-icon" aria-label="Change page icon">
             ${activePage.icon || '📄'}
@@ -46,6 +52,25 @@ export function renderEditor(container, { activePage, onUpdatePage, onOpenCodeFu
         >${escapeHtml(activePage.title === 'Untitled' ? '' : activePage.title)}</h1>
 
         <div class="editor-properties">
+          <label class="editor-prop editor-prop-select">
+            Course
+            <select data-action="set-course" class="editor-select">
+              ${COURSES.map(
+                (c) =>
+                  `<option value="${escapeAttr(c)}" ${activePage.course === c ? 'selected' : ''}>${escapeHtml(c)}</option>`
+              ).join('')}
+            </select>
+          </label>
+          <label class="editor-prop editor-prop-select">
+            Lecture
+            <input
+              type="text"
+              class="editor-input"
+              data-action="set-lecture"
+              placeholder="e.g. Week 3 — APIs"
+              value="${escapeAttr(activePage.lecture ?? '')}"
+            />
+          </label>
           <button type="button" class="editor-prop" data-action="toggle-favorite">
             ${activePage.favorite ? '★' : '☆'} ${activePage.favorite ? 'Favorited' : 'Add to favorites'}
           </button>
@@ -157,6 +182,16 @@ export function renderEditor(container, { activePage, onUpdatePage, onOpenCodeFu
 
   container.querySelector('[data-action="toggle-favorite"]')?.addEventListener('click', onToggleFavorite)
 
+  container.querySelector('[data-action="set-course"]')?.addEventListener('change', (e) => {
+    onUpdatePage({ course: e.target.value })
+  })
+  container.querySelector('[data-action="set-lecture"]')?.addEventListener('change', (e) => {
+    onUpdatePage({ lecture: e.target.value.trim() })
+  })
+  container.querySelector('[data-action="set-lecture"]')?.addEventListener('blur', (e) => {
+    onUpdatePage({ lecture: e.target.value.trim() })
+  })
+
   document.addEventListener('click', () => {
     iconPicker?.classList.add('hidden')
     coverPicker?.classList.add('hidden')
@@ -244,4 +279,8 @@ function escapeHtml(value) {
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
+}
+
+function escapeAttr(value) {
+  return escapeHtml(value ?? '').replaceAll("'", '&#39;')
 }

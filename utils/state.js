@@ -6,17 +6,26 @@ import {
   addCalendarEvent,
   deleteCalendarEvent,
   loadCalendarEvents,
+  loadCalendarState,
 } from './calendar.js'
 import { loadFromStorage, saveToStorage } from './persistence.js'
 import {
-  fetchUserData,
-  syncPages,
-  syncCalendarEvents,
-  syncUserSettings,
-  deletePageFromCloud,
-  deleteEventFromCloud,
+  fetchWorkspace,
+  saveWorkspace,
+  formatDatabaseError,
+  testDatabaseConnection,
+  signOut,
 } from './supabaseSync.js'
 import { isSupabaseConfigured } from './supabase.js'
+import { COURSES } from './courses.js'
+import {
+  generateCardsFromNote,
+  isCardDue,
+  reviewCard,
+} from './flashcards.js'
+import { parseSyllabus } from './syllabus.js'
+import { generateWeeklyPlan } from './planner.js'
+import { shouldSeedDemo, applyDemoToStorage, getDemoWorkspace } from './seedDemo.js'
 
 const DEFAULT_PAGES = [
   {
@@ -54,7 +63,19 @@ const DEFAULT_PAGES = [
   },
 ]
 
-const stored = loadFromStorage()
+const rawStored = loadFromStorage()
+const stored = shouldSeedDemo(rawStored)
+  ? applyDemoToStorage(rawStored) ?? getDemoWorkspace()
+  : rawStored
+
+if (shouldSeedDemo(rawStored)) {
+  saveToStorage({
+    ...stored,
+    sidebarOpen: stored?.sidebarOpen ?? true,
+    codefusionMessages: stored?.codefusionMessages ?? [],
+    privateSectionCollapsed: stored?.privateSectionCollapsed ?? false,
+  })
+}
 
 let pages = stored?.pages ?? structuredClone(DEFAULT_PAGES)
 let activePageId = stored?.activePageId ?? pages[0].id
@@ -68,11 +89,15 @@ let codefusionMessages = stored?.codefusionMessages ?? [
     text: "Hi! I'm CodeFusion, your AI assistant. Choose a quick action or type a prompt below.",
   },
 ]
-let activeView = stored?.activeView ?? 'home'
+let activeView = stored?.activeView === 'assistant' ? 'home' : (stored?.activeView ?? 'home')
 
 // Auth & sync
 let user = null
 let syncStatus = isSupabaseConfigured ? 'idle' : 'offline'
+let dbStatus = isSupabaseConfigured ? 'unknown' : 'offline'
+let syncError = null
+let lastSyncedAt = null
+let dbSetupModalOpen = false
 let authModalOpen = false
 let shareModalOpen = false
 let templatesModalOpen = false
@@ -81,14 +106,51 @@ let inboxModalOpen = false
 let eventModalOpen = false
 let shortcutsModalOpen = false
 let privateSectionCollapsed = stored?.privateSectionCollapsed ?? false
+let flashcards = stored?.flashcards ?? []
+let activeCourse = stored?.activeCourse ?? COURSES[0]
+
+let profile = stored?.profile ?? {
+  name: '',
+  university: '',
+  semester: '',
+  courses: [COURSES[0]],
+  syllabusText: '',
+}
+
+let assignments = stored?.assignments ?? [
+  {
+    id: 'asgn-1',
+    title: 'XML Project presentation',
+    course: COURSES[0],
+    dueDate: Date.now() + 3 * 86400000,
+    status: 'progress',
+    priority: 'high',
+  },
+  {
+    id: 'asgn-2',
+    title: 'SQL Server lab report',
+    course: COURSES[1],
+    dueDate: Date.now() + 6 * 86400000,
+    status: 'todo',
+    priority: 'normal',
+  },
+]
+
+let studyPlan = stored?.studyPlan ?? []
+let studyLog = stored?.studyLog ?? {}
 
 if (stored?.calendarEvents) {
   loadCalendarEvents(stored.calendarEvents)
+} else if (shouldSeedDemo(rawStored)) {
+  loadCalendarEvents(getDemoWorkspace().calendarEvents)
 }
 
 const listeners = new Set()
 let persistTimer
 let cloudSyncTimer
+let syncInFlight = false
+let syncPending = false
+let signingOut = false
 
 function persist() {
   clearTimeout(persistTimer)
@@ -101,34 +163,223 @@ function persist() {
       activeView,
       calendarEvents: getCalendarState().calendarEvents,
       privateSectionCollapsed,
+      flashcards,
+      activeCourse,
+      profile,
+      assignments,
+      studyPlan,
+      studyLog,
+      demoVersion: 3,
     })
     scheduleCloudSync()
   }, 400)
 }
 
+function getWorkspaceSnapshot() {
+  const calendar = getCalendarState()
+  return {
+    version: 1,
+    pages,
+    activePageId,
+    sidebarOpen,
+    activeView,
+    codefusionMessages,
+    calendarEvents: calendar.calendarEvents,
+    calendarMonth: calendar.calendarMonth,
+    calendarYear: calendar.calendarYear,
+    selectedDateKey: calendar.selectedDateKey,
+    privateSectionCollapsed,
+    flashcards,
+    activeCourse,
+    profile,
+    assignments,
+    studyPlan,
+    studyLog,
+  }
+}
+
+function applyWorkspaceSnapshot(snapshot) {
+  if (!snapshot) return false
+
+  if (Array.isArray(snapshot.pages) && snapshot.pages.length) {
+    pages = snapshot.pages
+  }
+  if (snapshot.activePageId && pages.some((p) => p.id === snapshot.activePageId)) {
+    activePageId = snapshot.activePageId
+  } else {
+    activePageId = pages.find((p) => !p.trashed)?.id ?? pages[0]?.id
+  }
+  if (typeof snapshot.sidebarOpen === 'boolean') sidebarOpen = snapshot.sidebarOpen
+  if (snapshot.activeView) {
+    activeView = snapshot.activeView === 'assistant' ? 'home' : snapshot.activeView
+  }
+  if (snapshot.codefusionMessages) codefusionMessages = snapshot.codefusionMessages
+  if (typeof snapshot.privateSectionCollapsed === 'boolean') {
+    privateSectionCollapsed = snapshot.privateSectionCollapsed
+  }
+
+  loadCalendarState({
+    events: snapshot.calendarEvents ?? [],
+    month: snapshot.calendarMonth,
+    year: snapshot.calendarYear,
+    selectedDateKey: snapshot.selectedDateKey,
+  })
+
+  if (Array.isArray(snapshot.flashcards)) flashcards = snapshot.flashcards
+  if (snapshot.activeCourse) activeCourse = snapshot.activeCourse
+  if (snapshot.profile) profile = { ...profile, ...snapshot.profile }
+  if (Array.isArray(snapshot.assignments)) assignments = snapshot.assignments
+  if (Array.isArray(snapshot.studyPlan)) studyPlan = snapshot.studyPlan
+  if (snapshot.studyLog) studyLog = snapshot.studyLog
+
+  return true
+}
+
+function maxPageUpdatedAt(snapshot) {
+  if (!snapshot?.pages?.length) return 0
+  return Math.max(...snapshot.pages.map((page) => page.updatedAt ?? 0))
+}
+
+function mergeCalendarEvents(localEvents = [], remoteEvents = []) {
+  const merged = new Map()
+  for (const event of [...remoteEvents, ...localEvents]) {
+    const key = event.id ?? `${event.date ?? ''}:${event.title ?? ''}`
+    const existing = merged.get(key)
+    if (!existing || (event.updatedAt ?? 0) >= (existing.updatedAt ?? 0)) {
+      merged.set(key, event)
+    }
+  }
+  return [...merged.values()]
+}
+
+function mergeWorkspaceSnapshots(local, remote) {
+  if (!remote) return local
+  if (!local?.pages?.length) return remote
+
+  const pageMap = new Map()
+  for (const page of remote.pages ?? []) {
+    pageMap.set(page.id, page)
+  }
+  for (const page of local.pages ?? []) {
+    const existing = pageMap.get(page.id)
+    if (!existing || (page.updatedAt ?? 0) >= (existing.updatedAt ?? 0)) {
+      pageMap.set(page.id, page)
+    }
+  }
+
+  const localNewer = maxPageUpdatedAt(local) > maxPageUpdatedAt(remote)
+  const prefer = localNewer ? local : remote
+  const fallback = localNewer ? remote : local
+  const localMessages = local.codefusionMessages?.length ?? 0
+  const remoteMessages = remote.codefusionMessages?.length ?? 0
+
+  const mergedPages = [...pageMap.values()]
+
+  return {
+    version: 1,
+    pages: mergedPages,
+    activePageId: mergedPages.some((p) => p.id === prefer.activePageId)
+      ? prefer.activePageId
+      : fallback.activePageId ?? mergedPages.find((p) => !p.trashed)?.id ?? mergedPages[0]?.id,
+    sidebarOpen: prefer.sidebarOpen ?? fallback.sidebarOpen,
+    activeView: prefer.activeView ?? fallback.activeView,
+    codefusionMessages:
+      localMessages >= remoteMessages ? local.codefusionMessages : remote.codefusionMessages,
+    calendarEvents: mergeCalendarEvents(local.calendarEvents, remote.calendarEvents),
+    calendarMonth: prefer.calendarMonth ?? fallback.calendarMonth,
+    calendarYear: prefer.calendarYear ?? fallback.calendarYear,
+    selectedDateKey: prefer.selectedDateKey ?? fallback.selectedDateKey,
+    privateSectionCollapsed:
+      prefer.privateSectionCollapsed ?? fallback.privateSectionCollapsed,
+    flashcards: mergeFlashcards(local.flashcards, remote.flashcards),
+    activeCourse: prefer.activeCourse ?? fallback.activeCourse ?? COURSES[0],
+    profile: { ...fallback.profile, ...prefer.profile },
+    assignments: mergeById(local.assignments, remote.assignments),
+    studyPlan: prefer.studyPlan?.length ? prefer.studyPlan : remote.studyPlan,
+    studyLog: { ...remote.studyLog, ...local.studyLog },
+  }
+}
+
+function mergeById(local = [], remote = []) {
+  const map = new Map()
+  for (const item of [...remote, ...local]) {
+    if (!item?.id) continue
+    map.set(item.id, item)
+  }
+  return [...map.values()]
+}
+
+function mergeFlashcards(localCards = [], remoteCards = []) {
+  const merged = new Map()
+  for (const card of [...remoteCards, ...localCards]) {
+    const existing = merged.get(card.id)
+    if (!existing || (card.updatedAt ?? 0) >= (existing.updatedAt ?? 0)) {
+      merged.set(card.id, card)
+    }
+  }
+  return [...merged.values()]
+}
+
 function scheduleCloudSync() {
   if (!user) return
+  syncPending = true
   clearTimeout(cloudSyncTimer)
-  cloudSyncTimer = setTimeout(async () => {
-    try {
-      setSyncStatus('syncing')
-      await syncPages(user.id, pages)
-      await syncCalendarEvents(user.id, getCalendarState().calendarEvents)
-      await syncUserSettings(user.id, {
-        activePageId,
-        sidebarOpen,
-        activeView,
-        codefusionMessages,
-      })
-      setSyncStatus('synced')
-    } catch {
-      setSyncStatus('error')
+  cloudSyncTimer = setTimeout(() => runCloudSync(), 1200)
+}
+
+async function runCloudSync(retry = true) {
+  if (!user) return
+  const userId = user.id
+  if (syncInFlight) {
+    syncPending = true
+    return
+  }
+
+  syncInFlight = true
+  syncPending = false
+
+  try {
+    setSyncStatus('syncing')
+    syncError = null
+    await saveWorkspace(userId, getWorkspaceSnapshot())
+    if (!user || user.id !== userId) return
+    lastSyncedAt = Date.now()
+    setSyncStatus('synced')
+    setDbStatus('connected')
+  } catch (err) {
+    if (!user || user.id !== userId) return
+    if (retry) {
+      syncInFlight = false
+      await new Promise((r) => setTimeout(r, 1500))
+      return runCloudSync(false)
     }
-  }, 800)
+    syncError = formatDatabaseError(err)
+    setSyncStatus('error')
+    if (syncError.toLowerCase().includes('missing') || syncError.toLowerCase().includes('does not exist')) {
+      setDbStatus('missing_table')
+    } else if (syncError.toLowerCase().includes('permission') || syncError.toLowerCase().includes('policy')) {
+      setDbStatus('permission')
+    } else if (syncError.toLowerCase().includes('signed in') || syncError.toLowerCase().includes('session')) {
+      setDbStatus('error')
+    } else {
+      setDbStatus('error')
+    }
+  } finally {
+    syncInFlight = false
+    if (syncPending) {
+      syncPending = false
+      scheduleCloudSync()
+    }
+  }
 }
 
 function setSyncStatus(status) {
   syncStatus = status
+  listeners.forEach((listener) => listener(getState()))
+}
+
+function setDbStatus(status) {
+  dbStatus = status
   listeners.forEach((listener) => listener(getState()))
 }
 
@@ -149,6 +400,10 @@ export function getState() {
     activeView,
     user,
     syncStatus,
+    dbStatus,
+    syncError,
+    lastSyncedAt,
+    dbSetupModalOpen,
     authModalOpen,
     shareModalOpen,
     templatesModalOpen,
@@ -158,6 +413,12 @@ export function getState() {
     shortcutsModalOpen,
     isSupabaseConfigured,
     privateSectionCollapsed,
+    flashcards,
+    activeCourse,
+    profile,
+    assignments,
+    studyPlan,
+    studyLog,
     ...getCalendarState(),
   }
 }
@@ -201,9 +462,180 @@ export function setActivePage(id) {
   notify()
 }
 
+export function getDueFlashcards(courseFilter = activeCourse) {
+  return flashcards.filter(
+    (card) =>
+      (courseFilter === 'All' || card.course === courseFilter) && isCardDue(card)
+  )
+}
+
+export function openFlashcards() {
+  activeView = 'flashcards'
+  mobileSidebarOpen = false
+  notify()
+}
+
+export function closeFlashcards() {
+  activeView = 'home'
+  notify()
+}
+
+export function setActiveCourse(course) {
+  activeCourse = course
+  notify()
+}
+
+export function setPageCourse(pageId, course) {
+  const page = pages.find((p) => p.id === pageId)
+  if (!page) return
+  page.course = course
+  page.updatedAt = Date.now()
+  notify()
+}
+
+export function setPageLecture(pageId, lecture) {
+  const page = pages.find((p) => p.id === pageId)
+  if (!page) return
+  page.lecture = lecture
+  page.updatedAt = Date.now()
+  notify()
+}
+
+export function generateFlashcardsFromPage(pageId) {
+  const page = pages.find((p) => p.id === pageId && !p.trashed)
+  if (!page) return 0
+
+  const newCards = generateCardsFromNote(page.content, {
+    course: page.course || activeCourse,
+    pageId: page.id,
+  })
+  if (!newCards.length) return 0
+
+  flashcards = [...newCards, ...flashcards]
+  notify()
+  return newCards.length
+}
+
+export function reviewFlashcard(cardId, quality) {
+  const index = flashcards.findIndex((c) => c.id === cardId)
+  if (index === -1) return
+  flashcards[index] = reviewCard(flashcards[index], quality)
+  notify()
+}
+
+export function deleteFlashcard(cardId) {
+  flashcards = flashcards.filter((c) => c.id !== cardId)
+  notify()
+}
+
 export function openHome() {
   activeView = 'home'
   mobileSidebarOpen = false
+  notify()
+}
+
+export function openProfile() {
+  activeView = 'profile'
+  mobileSidebarOpen = false
+  notify()
+}
+
+export function openAssignments() {
+  activeView = 'assignments'
+  mobileSidebarOpen = false
+  notify()
+}
+
+export function openStudyPlanner() {
+  activeView = 'planner'
+  mobileSidebarOpen = false
+  notify()
+}
+
+export function openExamMode() {
+  activeView = 'exam'
+  mobileSidebarOpen = false
+  notify()
+}
+
+export function openAi() {
+  activeView = 'ai'
+  mobileSidebarOpen = false
+  notify()
+}
+
+export function openAnalytics() {
+  activeView = 'analytics'
+  mobileSidebarOpen = false
+  notify()
+}
+
+export function saveProfile(updates) {
+  profile = { ...profile, ...updates }
+  notify()
+}
+
+export function parseAndImportSyllabus(text) {
+  profile.syllabusText = text
+  const events = parseSyllabus(text)
+  for (const ev of events) {
+    addCalendarEvent({
+      title: ev.title,
+      date: ev.dateKey,
+    })
+  }
+  notify()
+  return events.length
+}
+
+export function addAssignment(data) {
+  assignments = [
+    {
+      id: `asgn-${Date.now()}`,
+      priority: 'normal',
+      status: 'todo',
+      ...data,
+    },
+    ...assignments,
+  ]
+  notify()
+}
+
+export function moveAssignment(id, status) {
+  const a = assignments.find((x) => x.id === id)
+  if (!a) return
+  a.status = status
+  a.updatedAt = Date.now()
+  notify()
+}
+
+export function deleteAssignment(id) {
+  assignments = assignments.filter((a) => a.id !== id)
+  notify()
+}
+
+export function generateStudyPlan() {
+  studyPlan = generateWeeklyPlan({
+    assignments,
+    courses: profile.courses?.length ? profile.courses : COURSES,
+    hoursPerWeek: 10,
+  })
+  notify()
+}
+
+export function activateExamMode() {
+  const page = getActivePage()
+  if (!page) return 0
+  const count = generateFlashcardsFromPage(page.id)
+  const key = new Date().toISOString().slice(0, 10)
+  studyLog[key] = (studyLog[key] ?? 0) + 15
+  notify()
+  return count
+}
+
+export function logStudyMinutes(mins = 30) {
+  const key = new Date().toISOString().slice(0, 10)
+  studyLog[key] = (studyLog[key] ?? 0) + mins
   notify()
 }
 
@@ -258,6 +690,44 @@ export function duplicatePage(id) {
   mobileSidebarOpen = false
   notify()
   return newPage
+}
+
+export function openDbSetupModal() {
+  dbSetupModalOpen = true
+  notify()
+}
+
+export function closeDbSetupModal() {
+  dbSetupModalOpen = false
+  notify()
+}
+
+export async function checkDatabaseConnection() {
+  if (!isSupabaseConfigured) {
+    setDbStatus('offline')
+    return { ok: false }
+  }
+
+  try {
+    const result = await testDatabaseConnection()
+    setDbStatus(result.status)
+    if (!result.ok) syncError = result.message
+    listeners.forEach((listener) => listener(getState()))
+    return result
+  } catch (err) {
+    setDbStatus('error')
+    syncError = formatDatabaseError(err)
+    listeners.forEach((listener) => listener(getState()))
+    return { ok: false, status: 'error', message: syncError }
+  }
+}
+
+export async function forceCloudSync() {
+  if (!user) return false
+  clearTimeout(cloudSyncTimer)
+  syncPending = false
+  await runCloudSync()
+  return syncStatus === 'synced'
 }
 
 export function openAuthModal() {
@@ -332,26 +802,71 @@ export function closeShortcutsModal() {
 
 export function setUser(newUser) {
   user = newUser
+  if (!newUser) {
+    clearTimeout(cloudSyncTimer)
+    syncInFlight = false
+    syncPending = false
+    syncStatus = isSupabaseConfigured ? 'idle' : 'offline'
+    syncError = null
+  }
   notify()
 }
 
-export async function loadFromSupabase(userId) {
-  const data = await fetchUserData(userId)
-  if (!data) return
+export function isSigningOut() {
+  return signingOut
+}
 
-  if (data.pages) pages = data.pages
-  if (data.calendarEvents) loadCalendarEvents(data.calendarEvents)
-  if (data.activePageId && pages.some((p) => p.id === data.activePageId)) {
-    activePageId = data.activePageId
-  } else {
-    activePageId = pages.find((p) => !p.trashed)?.id ?? pages[0]?.id
-  }
-  if (data.sidebarOpen !== null && data.sidebarOpen !== undefined) sidebarOpen = data.sidebarOpen
-  if (data.activeView) activeView = data.activeView
-  if (data.codefusionMessages) codefusionMessages = data.codefusionMessages
+export async function signOutUser() {
+  if (signingOut) return
+  signingOut = true
 
-  setSyncStatus('synced')
+  clearTimeout(cloudSyncTimer)
+  syncInFlight = false
+  syncPending = false
+  authModalOpen = false
+
+  user = null
+  syncStatus = isSupabaseConfigured ? 'idle' : 'offline'
+  syncError = null
+  dbStatus = isSupabaseConfigured ? 'idle' : 'offline'
   notify()
+
+  try {
+    await signOut()
+  } catch {
+    /* local session already cleared above */
+  } finally {
+    signingOut = false
+  }
+
+  checkDatabaseConnection()
+    .catch(() => setDbStatus('idle'))
+    .finally(() => notify())
+}
+
+export async function loadFromSupabase(userId) {
+  const localSnapshot = getWorkspaceSnapshot()
+  const remote = await fetchWorkspace(userId)
+
+  if (remote?.snapshot) {
+    const merged = mergeWorkspaceSnapshots(localSnapshot, remote.snapshot)
+    applyWorkspaceSnapshot(merged)
+    setSyncStatus('synced')
+    setDbStatus('connected')
+    syncError = null
+    notify()
+
+    await saveWorkspace(userId, getWorkspaceSnapshot())
+    return maxPageUpdatedAt(localSnapshot) > maxPageUpdatedAt(remote.snapshot) ? 'merged-local' : 'loaded'
+  }
+
+  // First login — upload local workspace to cloud
+  await saveWorkspace(userId, localSnapshot)
+  setSyncStatus('synced')
+  setDbStatus('connected')
+  syncError = null
+  notify()
+  return 'uploaded'
 }
 
 export function resetToLocalDefaults() {
@@ -376,6 +891,8 @@ export function createPage(template) {
     icon: template?.icon ?? '📄',
     cover: 'ocean',
     content: template?.content ?? '',
+    course: template?.course ?? activeCourse,
+    lecture: template?.lecture ?? '',
     favorite: false,
     trashed: false,
     updatedAt: Date.now(),
@@ -428,7 +945,6 @@ export function calendarAddEvent(payload) {
 
 export function calendarDeleteEvent(id) {
   deleteCalendarEvent(id)
-  if (user) deleteEventFromCloud(id).catch(() => setSyncStatus('error'))
   notify()
 }
 
@@ -469,7 +985,6 @@ export function restorePage(id) {
 
 export function permanentDeletePage(id) {
   pages = pages.filter((page) => page.id !== id)
-  if (user) deletePageFromCloud(id).catch(() => setSyncStatus('error'))
   if (activePageId === id) {
     activePageId = pages.find((p) => !p.trashed)?.id ?? pages[0]?.id
   }
