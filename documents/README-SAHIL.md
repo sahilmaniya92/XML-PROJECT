@@ -38,4 +38,4 @@
 
 ---
 
-[← Main README](./README.md)
+[← Main README](../README.md)

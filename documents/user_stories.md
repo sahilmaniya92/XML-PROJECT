@@ -182,4 +182,4 @@ Simple list of what we are building.
 
 ---
 
-[Progress tracker](./project_progress_tracker.md) · [MoSCoW timeline](./mosco_timeline.md) · [Main README](./README.md)
+[Progress tracker](./project_progress_tracker.md) · [MoSCoW timeline](./mosco_timeline.md) · [Main README](../README.md)

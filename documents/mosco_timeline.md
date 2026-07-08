@@ -144,4 +144,4 @@ June 2026          July 2026           August 2026
 
 - [User stories](./user_stories.md)
 - [Progress tracker](./project_progress_tracker.md)
-- [Main README](./README.md)
+- [Main README](../README.md)

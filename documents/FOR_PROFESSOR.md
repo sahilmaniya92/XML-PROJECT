@@ -18,7 +18,7 @@ This is a **story-map MVP**, not a finished commercial app.
 | Student | ID | Epic | What to click | What it does |
 |---------|-----|------|---------------|--------------|
 | Dhruv Patel | N10015893 | 2 | **Today** | Shows today's events, due assignments, simple stats |
-| Parth Patel | N01779255 | 3 | **xml/Js lecture note** | Course dropdown + lecture field + plain `<textarea>` notes |
+| Parth Patel | N01779255 | 3 | **+ Note** in sidebar | Course dropdown + lecture field + plain `<textarea>` notes |
 | Kelvin Idoko | N01777723 | 5 | **Assignments** | Kanban: drag cards To do → In progress → Done |
 | Sahil Maniya | N01769967 | 8 | **Exam prep** | Reads `##` and `•` from open note (basic) |
 
@@ -75,9 +75,9 @@ Open `components/editor.js` and explain:
 ## Why it looks "big"
 
 - **9 sidebar links** = story map coverage (screens exist), not 9 finished features.
-- **Demo seed data** (`utils/seedDemo.js`) loads sample notes so the demo works on first open.
+- **Demo seed data** (`utils/seedDemo.js`) loads sample assignments/calendar on first open (no default notes on `parth`).
 - Old CSS from earlier experiments is still in `styles.css` — we simplified the editor, not deleted every old style rule.
 
 ---
 
-[← Main README](./README.md) · [Progress tracker](./project_progress_tracker.md) · [File map](./FILES.md)
+[← Main README](../README.md) · [Progress tracker](./project_progress_tracker.md) · [File map](./FILES.md)

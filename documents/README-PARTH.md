@@ -62,4 +62,4 @@ File map (who owns what): [FILES.md](./FILES.md)
 
 ---
 
-[← Main README](./README.md)
+[← Main README](../README.md)

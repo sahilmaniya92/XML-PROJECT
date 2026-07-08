@@ -5,7 +5,7 @@ Data saves in **browser localStorage**. Sign in to sync one JSON row to **Supaba
 
 > **For professor:** This is a **story-map MVP**, not a finished product.  
 > **4 features** are demo-ready (one per teammate). **AI is not built** (placeholder only).  
-> See **[FOR_PROFESSOR.md](./FOR_PROFESSOR.md)** for honest scope and how to present.
+> See **[FOR_PROFESSOR.md](./documents/FOR_PROFESSOR.md)** for honest scope and how to present.
 
 ## Honest scope (read this first)
 
@@ -45,28 +45,28 @@ We have **9 sidebar screens** because the story map has 9 epics — not because 
 
 | Person | File |
 |--------|------|
-| Dhruv Patel | [README-DHRUV.md](./README-DHRUV.md) |
-| Sahil Maniya | [README-SAHIL.md](./README-SAHIL.md) |
-| Parth Patel | [README-PARTH.md](./README-PARTH.md) |
-| Kelvin Idoko | [README-KELVIN.md](./README-KELVIN.md) |
+| Dhruv Patel | [README-DHRUV.md](./documents/README-DHRUV.md) |
+| Sahil Maniya | [README-SAHIL.md](./documents/README-SAHIL.md) |
+| Parth Patel | [README-PARTH.md](./documents/README-PARTH.md) |
+| Kelvin Idoko | [README-KELVIN.md](./documents/README-KELVIN.md) |
 
-**Progress tracker:** [project_progress_tracker.md](./project_progress_tracker.md)  
-**User stories:** [user_stories.md](./user_stories.md)  
-**Timeline:** [mosco_timeline.md](./mosco_timeline.md) (June → August 2026)  
-**Professor / demo honesty:** [FOR_PROFESSOR.md](./FOR_PROFESSOR.md)  
-**File ownership & dependencies:** [FILES.md](./FILES.md)
+**Progress tracker:** [project_progress_tracker.md](./documents/project_progress_tracker.md)  
+**User stories:** [user_stories.md](./documents/user_stories.md)  
+**Timeline:** [mosco_timeline.md](./documents/mosco_timeline.md) (June → August 2026)  
+**Professor / demo honesty:** [FOR_PROFESSOR.md](./documents/FOR_PROFESSOR.md)  
+**File ownership & dependencies:** [FILES.md](./documents/FILES.md)
 
 ## One demo per person
 
 | Person | User story | Click here |
 |--------|------------|------------|
 | **Dhruv** | View today's schedule | **Today** |
-| **Parth** | Notes linked to course + lecture | **xml/Js — XML & JavaScript lecture** |
+| **Parth** | Notes linked to course + lecture | **+ Note** in sidebar → set course |
 | **Sahil** | Exam prep from open note | **Exam prep** → activate |
 | **Kelvin** | Kanban assignment tracking | **Assignments** → move cards |
 | **All** | AI section (shell) | **AI** → coming soon |
 
-> First open loads demo data (lecture note, today's events, assignments).
+> First open loads demo data (assignments, calendar events — no default notes).
 
 ## Run
 

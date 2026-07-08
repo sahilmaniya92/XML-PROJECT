@@ -72,11 +72,11 @@ Personal demo guides: [README-DHRUV](./README-DHRUV.md) · [README-PARTH](./READ
 
 | File | Owner |
 |------|-------|
-| `user_stories.md` | Whole team |
-| `project_progress_tracker.md` | Whole team |
-| `mosco_timeline.md` | Whole team |
-| `FOR_PROFESSOR.md` | Whole team |
-| `FILES.md` | Whole team (this file) |
+| `documents/user_stories.md` | Whole team |
+| `documents/project_progress_tracker.md` | Whole team |
+| `documents/mosco_timeline.md` | Whole team |
+| `documents/FOR_PROFESSOR.md` | Whole team |
+| `documents/FILES.md` | Whole team (this file) |
 
 ### Not used on `parth` branch (old experiments — safe to ignore)
 
@@ -275,4 +275,4 @@ main.js
 
 ---
 
-[← Main README](./README.md) · [For professor](./FOR_PROFESSOR.md) · [Progress tracker](./project_progress_tracker.md)
+[← Main README](../README.md) · [For professor](./FOR_PROFESSOR.md) · [Progress tracker](./project_progress_tracker.md)

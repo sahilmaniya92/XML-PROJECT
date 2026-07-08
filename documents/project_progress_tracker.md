@@ -162,4 +162,4 @@ Last updated: July 7, 2026
 | Sahil Maniya | [README-SAHIL.md](./README-SAHIL.md) |
 | Kelvin Idoko | [README-KELVIN.md](./README-KELVIN.md) |
 
-[← Main README](./README.md)
+[← Main README](../README.md)
