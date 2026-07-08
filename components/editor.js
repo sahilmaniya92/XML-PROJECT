@@ -1,14 +1,48 @@
+// Parth — Epic 3 notes editor (also todo + journal types)
 import { COURSES } from '../utils/courses.js'
 import { escapeHtml, escapeAttr } from '../utils/shared.js'
 
-const ICONS = ['📝', '📋', '✅', '📚', '📄', '💡', '🔥']
+const ICONS = ['📝', '📋', '✅', '📚', '📄', '💡', '🔥', '📓']
 
-/** Simple note editor — title, course, lecture, plain text area */
+const PLACEHOLDERS = {
+  note: `Type your lecture notes here...
+
+## Key concepts
+• First point
+• Second point
+
+Use ## for headings and • for bullets.`,
+  todo: `☐ Finish XML homework
+☐ Review for quiz
+☐ Group meeting
+
+Use ☐ for open tasks and ☑ when done.`,
+  journal: `How was today?
+
+What did you learn?
+What was hard?
+
+Write freely — no special format needed.`,
+}
+
+const HINTS = {
+  note: 'Course notes — use ## headings and • bullets. Flashcards read this text.',
+  todo: 'Todo list — use ☐ and ☑ at the start of each line. Shows on Today dashboard.',
+  journal: 'Personal journal — free writing, not linked to a course.',
+}
+
+const KIND_LABELS = { note: 'Note', todo: 'Todo list', journal: 'Journal' }
+
 export function renderEditor(container, { activePage, onUpdatePage, onToggleFavorite }) {
+  const kind = activePage.kind ?? 'note'
+  const showCourse = kind === 'note'
+
   container.innerHTML = `
     <div class="editor-simple">
+      <p class="editor-kind-tag">${KIND_LABELS[kind] ?? 'Page'}</p>
+
       ${
-        activePage.course
+        showCourse && activePage.course
           ? `<p class="editor-story-hint">Linked to <strong>${escapeHtml(activePage.course)}</strong>${activePage.lecture ? ` · ${escapeHtml(activePage.lecture)}` : ''}</p>`
           : ''
       }
@@ -29,11 +63,13 @@ export function renderEditor(container, { activePage, onUpdatePage, onToggleFavo
         type="text"
         class="editor-title-input"
         data-field="title"
-        placeholder="Note title"
+        placeholder="${kind === 'journal' ? 'Journal title' : kind === 'todo' ? 'List name' : 'Note title'}"
         value="${escapeAttr(activePage.title === 'Untitled' ? '' : activePage.title)}"
       />
 
-      <div class="editor-meta">
+      ${
+        showCourse
+          ? `<div class="editor-meta">
         <label>
           Course
           <select data-field="course" class="editor-select">
@@ -53,20 +89,16 @@ export function renderEditor(container, { activePage, onUpdatePage, onToggleFavo
             value="${escapeAttr(activePage.lecture ?? '')}"
           />
         </label>
-      </div>
+      </div>`
+          : ''
+      }
 
       <textarea
         data-field="content"
         class="editor-textarea"
-        placeholder="Type your notes here...
-
-## Key concepts
-• First point
-• Second point
-
-Use ## for headings and • for bullets."
+        placeholder="${escapeAttr(PLACEHOLDERS[kind] ?? PLACEHOLDERS.note)}"
       ></textarea>
-      <p class="editor-hint">Flashcards and exam prep read ## headings and • bullets from this text.</p>
+      <p class="editor-hint">${HINTS[kind] ?? HINTS.note}</p>
     </div>
   `
 

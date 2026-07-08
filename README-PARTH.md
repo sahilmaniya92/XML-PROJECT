@@ -4,7 +4,20 @@
 |---|---|
 | **Student ID** | N01779255 |
 | **Epics** | 3 (Notes), 7 (Flashcards) |
-| **Branch** | `parth` — simplified student-style code |
+| **Branch** | `parth` — simplified on purpose (textarea, no block editor) |
+
+---
+
+## If professor asks "is this all AI?"
+
+Say this:
+
+1. **My part is `editor.js`** — about 100 lines, plain textarea + course dropdown.
+2. We **removed** the Notion-style block editor so the code is explainable.
+3. Epic 3 = when you pick a course, it saves on the page object in `state.js`.
+4. Flashcards (Epic 7) only **reads** `##` and `•` from that same text — partial, not finished.
+
+Full team honesty doc: [FOR_PROFESSOR.md](./FOR_PROFESSOR.md)
 
 ---
 
@@ -16,11 +29,13 @@
 
 **30-second demo**
 
-1. Sidebar → open **xml/Js — XML & JavaScript lecture**
-2. Point at the blue bar: **Linked to xml/Js · Week 3 — XML, DOM & JSON**
-3. Show **Course** dropdown + **Lecture** field (change course → saves automatically)
-4. Type in the **text area** under `## Key concepts` — plain text, no fancy blocks
-5. Sidebar shows **xml/Js** badge next to the note name
+1. Sidebar → click **+ Note** to create a lecture note
+2. Pick **Course** (xml/Js) and type **Lecture** (e.g. Week 3 — XML)
+3. Point at the orange bar: **Linked to xml/Js · Week 3…**
+4. Type in the **text area** under `## Key concepts`
+5. Sidebar shows the note under **Notes** with course badge
+
+**Also try:** **+ Todo** for `☐` tasks · **+ Journal** for free writing (no course)
 
 **Files you own:** `components/editor.js`, `utils/courses.js`
 

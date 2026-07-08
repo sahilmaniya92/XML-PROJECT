@@ -27,41 +27,7 @@ import { parseSyllabus } from './syllabus.js'
 import { generateWeeklyPlan } from './planner.js'
 import { shouldSeedDemo, applyDemoToStorage, getDemoWorkspace } from './seedDemo.js'
 
-const DEFAULT_PAGES = [
-  {
-    id: 'page-1',
-    title: 'Getting Started',
-    icon: '📝',
-    cover: 'ocean',
-    content:
-      'Welcome to TaskScape\n\nThis is your workspace for notes, tasks, and ideas — inspired by Notion.\n\nType / anywhere to insert blocks, or use the sidebar to switch pages.',
-    favorite: true,
-    trashed: false,
-    updatedAt: Date.now(),
-  },
-  {
-    id: 'page-2',
-    title: 'Project Notes',
-    icon: '📋',
-    cover: 'forest',
-    content:
-      '## Meeting Notes\n\n• Define project phases\n• Assign team roles\n• Review UI with professor\n\n## Next Steps\n\nYour data syncs to Supabase when signed in.',
-    favorite: false,
-    trashed: false,
-    updatedAt: Date.now() - 86400000,
-  },
-  {
-    id: 'page-3',
-    title: 'Task List',
-    icon: '✅',
-    cover: 'sunset',
-    content:
-      '☐ Finish Phase 3 UI\n☐ Present to professor\n☐ Connect Supabase backend\n☐ Integrate CodeFusion with Gemini API',
-    favorite: false,
-    trashed: false,
-    updatedAt: Date.now() - 172800000,
-  },
-]
+const DEFAULT_PAGES = []
 
 const rawStored = loadFromStorage()
 const stored = shouldSeedDemo(rawStored)
@@ -78,7 +44,10 @@ if (shouldSeedDemo(rawStored)) {
 }
 
 let pages = stored?.pages ?? structuredClone(DEFAULT_PAGES)
-let activePageId = stored?.activePageId ?? pages[0].id
+let activePageId = stored?.activePageId ?? null
+if (activePageId && !pages.some((p) => p.id === activePageId && !p.trashed)) {
+  activePageId = pages.find((p) => !p.trashed)?.id ?? null
+}
 let sidebarOpen = stored?.sidebarOpen ?? true
 let mobileSidebarOpen = false
 let codefusionOpen = false
@@ -90,6 +59,7 @@ let codefusionMessages = stored?.codefusionMessages ?? [
   },
 ]
 let activeView = stored?.activeView === 'assistant' ? 'home' : (stored?.activeView ?? 'home')
+if (activeView === 'page' && !activePageId) activeView = 'home'
 
 // Auth & sync
 let user = null
@@ -169,7 +139,7 @@ function persist() {
       assignments,
       studyPlan,
       studyLog,
-      demoVersion: 3,
+      demoVersion: 5,
     })
     scheduleCloudSync()
   }, 400)
@@ -429,8 +399,13 @@ function notify() {
 }
 
 export function getActivePage() {
+  if (!activePageId) return null
   const active = pages.find((page) => page.id === activePageId && !page.trashed)
-  return active ?? pages.find((p) => !p.trashed) ?? pages[0]
+  return active ?? pages.find((p) => !p.trashed) ?? null
+}
+
+export function getPagesByKind(kind) {
+  return getFilteredPages().filter((p) => (p.kind ?? 'note') === kind)
 }
 
 export function getFilteredPages() {
@@ -870,8 +845,8 @@ export async function loadFromSupabase(userId) {
 }
 
 export function resetToLocalDefaults() {
-  pages = structuredClone(DEFAULT_PAGES)
-  activePageId = pages[0].id
+  pages = []
+  activePageId = null
   activeView = 'home'
   codefusionMessages = [
     {
@@ -883,22 +858,48 @@ export function resetToLocalDefaults() {
   notify()
 }
 
-export const TASK_LIST_TEMPLATE = {
-  icon: '✅',
-  title: 'Task list',
-  content: '## Tasks\n\n☐ Task 1\n☐ Task 2\n☐ Task 3',
+export const PAGE_TEMPLATES = {
+  note: {
+    kind: 'note',
+    icon: '📚',
+    title: 'Untitled note',
+    content: '## Key concepts\n• \n',
+    lecture: '',
+  },
+  todo: {
+    kind: 'todo',
+    icon: '✅',
+    title: 'Todo list',
+    content: '☐ \n☐ \n',
+    lecture: '',
+  },
+  journal: {
+    kind: 'journal',
+    icon: '📓',
+    title: 'Journal entry',
+    content: '',
+    lecture: '',
+    course: '',
+  },
 }
 
-export function createPage(template) {
+export const TASK_LIST_TEMPLATE = PAGE_TEMPLATES.todo
+
+export function createPage(kindOrTemplate = 'note') {
+  const base =
+    typeof kindOrTemplate === 'string'
+      ? PAGE_TEMPLATES[kindOrTemplate] ?? PAGE_TEMPLATES.note
+      : kindOrTemplate
   const id = `page-${Date.now()}`
   const newPage = {
     id,
-    title: template?.title ?? 'Untitled',
-    icon: template?.icon ?? '📄',
+    kind: base.kind ?? 'note',
+    title: base.title ?? 'Untitled',
+    icon: base.icon ?? '📄',
     cover: 'ocean',
-    content: template?.content ?? '',
-    course: template?.course ?? activeCourse,
-    lecture: template?.lecture ?? '',
+    content: base.content ?? '',
+    course: base.kind === 'journal' ? '' : (base.course ?? activeCourse),
+    lecture: base.lecture ?? '',
     favorite: false,
     trashed: false,
     updatedAt: Date.now(),
@@ -970,14 +971,18 @@ export function addCodeFusionMessage(role, text) {
 }
 
 export function deletePage(id) {
-  const visible = pages.filter((p) => !p.trashed)
-  if (visible.length <= 1 && !pages.find((p) => p.id === id)?.trashed) return
   pages = pages.map((page) =>
     page.id === id ? { ...page, trashed: true, updatedAt: Date.now() } : page
   )
   if (activePageId === id) {
-    activePageId = pages.find((p) => !p.trashed)?.id ?? pages[0].id
-    activeView = 'page'
+    const next = pages.find((p) => !p.trashed)
+    if (next) {
+      activePageId = next.id
+      activeView = 'page'
+    } else {
+      activePageId = null
+      activeView = 'home'
+    }
   }
   notify()
 }
@@ -992,7 +997,9 @@ export function restorePage(id) {
 export function permanentDeletePage(id) {
   pages = pages.filter((page) => page.id !== id)
   if (activePageId === id) {
-    activePageId = pages.find((p) => !p.trashed)?.id ?? pages[0]?.id
+    const next = pages.find((p) => !p.trashed)
+    activePageId = next?.id ?? null
+    activeView = next ? 'page' : 'home'
   }
   notify()
 }

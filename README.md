@@ -3,6 +3,20 @@
 Simple academic app: notes, today's dashboard, assignments, flashcards, calendar.  
 Data saves in **browser localStorage**. Sign in to sync one JSON row to **Supabase**.
 
+> **For professor:** This is a **story-map MVP**, not a finished product.  
+> **4 features** are demo-ready (one per teammate). **AI is not built** (placeholder only).  
+> See **[FOR_PROFESSOR.md](./FOR_PROFESSOR.md)** for honest scope and how to present.
+
+## Honest scope (read this first)
+
+| Level | Count | Examples |
+|-------|-------|----------|
+| ✅ Demo-ready | **4** | Today dashboard, notes+course link, Kanban, exam prep |
+| 🟡 Basic / partial | **4** | Profile, planner, flashcards, analytics |
+| ⬜ Placeholder | **1** | AI screen (team — not connected) |
+
+We have **9 sidebar screens** because the story map has 9 epics — not because all 9 are finished.
+
 ## How it works (simple)
 
 1. **Open app** → you land on **Today** (dashboard).
@@ -38,7 +52,8 @@ Data saves in **browser localStorage**. Sign in to sync one JSON row to **Supaba
 
 **Progress tracker:** [project_progress_tracker.md](./project_progress_tracker.md)  
 **User stories:** [user_stories.md](./user_stories.md)  
-**Timeline:** [mosco_timeline.md](./mosco_timeline.md) (June → August 2026)
+**Timeline:** [mosco_timeline.md](./mosco_timeline.md) (June → August 2026)  
+**Professor / demo honesty:** [FOR_PROFESSOR.md](./FOR_PROFESSOR.md)
 
 ## One demo per person
 

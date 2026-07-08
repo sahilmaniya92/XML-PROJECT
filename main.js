@@ -172,7 +172,12 @@ function renderWorkspaceView(state, activePage) {
       onBack: openHome,
       onSetCourse: setActiveCourse,
       onGenerateFromNote: () => {
-        const count = generateFlashcardsFromPage(getActivePage().id)
+        const page = getActivePage()
+        if (!page) {
+          showToast('Create a note first (+ Note in sidebar)')
+          return
+        }
+        const count = generateFlashcardsFromPage(page.id)
         showToast(count ? `Created ${count} cards` : 'Add ## or • to your note')
       },
       onStartReview: () => {},
@@ -283,7 +288,11 @@ function renderApp() {
 
   renderSidebar(document.getElementById('sidebar'), {
     onSelectPage: setActivePage,
-    onNewPage: () => { createPage(); showToast('New note') },
+    onNewPage: (kind) => {
+      createPage(kind)
+      const labels = { note: 'Note', todo: 'Todo list', journal: 'Journal' }
+      showToast(`${labels[kind] ?? 'Page'} created`)
+    },
     onSearch: setSearchQuery,
     onOpenCalendarPlus: openCalendarPlus,
     onOpenHome: openHome,
@@ -302,7 +311,7 @@ function renderApp() {
   if (FULLSCREEN_VIEWS.has(state.activeView)) {
     topbar.style.display = 'none'
     renderWorkspaceView(state, activePage)
-  } else if (state.activeView === 'page') {
+  } else if (state.activeView === 'page' && activePage) {
     topbar.style.display = ''
     renderTopbar(topbar, {
       activePage,
@@ -320,6 +329,8 @@ function renderApp() {
       onUpdatePage: updateActivePage,
       onToggleFavorite: () => toggleFavorite(activePage.id),
     })
+  } else if (state.activeView === 'page') {
+    openHome()
   } else {
     topbar.style.display = 'none'
     openHome()
@@ -370,8 +381,8 @@ onAuthStateChange((event, session) => {
 document.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.key === 'n') {
     e.preventDefault()
-    createPage()
-    showToast('New note')
+    createPage('note')
+    showToast('Note created')
   }
   if (e.key === 'Escape') {
     closeAuthModal()

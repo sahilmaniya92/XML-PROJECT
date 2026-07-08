@@ -39,7 +39,7 @@ export function renderDashboard(container, {
           <p class="ws-eyebrow">${escapeHtml(new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }))}</p>
           <h1 class="ws-title">${greeting}, ${escapeHtml(name)}</h1>
           <p class="ws-lead">${profile.university ? escapeHtml(profile.university) + ' · ' : ''}Semester ${escapeHtml(profile.semester || '—')}</p>
-          <p class="ws-lead">User story: <strong>View today's schedule</strong> — only what matters for today, plus progress at a glance.</p>
+          <p class="ws-lead ws-lead-sub">Here is what needs your attention today.</p>
         </div>
         <button type="button" class="ws-btn ws-btn-ghost" data-action="profile">Edit profile</button>
       </header>
@@ -103,7 +103,7 @@ export function renderDashboard(container, {
 
       <section class="ws-panel">
         <div class="ws-panel-head">
-          <h2>Recent notes</h2>
+          <h2>Recent pages</h2>
         </div>
         <div class="ws-note-row">
           ${pages
@@ -114,10 +114,10 @@ export function renderDashboard(container, {
               (p) => `
             <button type="button" class="ws-note-chip" data-page-id="${p.id}">
               <span class="ws-note-chip-title">${escapeHtml(p.title)}</span>
-              <span class="ws-note-chip-meta">${escapeHtml(p.course?.split(' — ')[0] || 'Note')}</span>
+              <span class="ws-note-chip-meta">${escapeHtml(pageKindLabel(p))}</span>
             </button>`
             )
-            .join('') || '<p class="ws-empty">No notes yet</p>'}
+            .join('') || '<p class="ws-empty">No pages yet — use + Note in the sidebar</p>'}
         </div>
       </section>
 
@@ -138,6 +138,13 @@ export function renderDashboard(container, {
   container.querySelector('[data-action="assignments"]')?.addEventListener('click', onOpenAssignments)
   container.querySelector('[data-action="flashcards"]')?.addEventListener('click', onOpenFlashcards)
   container.querySelector('[data-action="profile"]')?.addEventListener('click', onOpenProfile)
+}
+
+function pageKindLabel(page) {
+  const kind = page.kind ?? 'note'
+  if (kind === 'todo') return 'Todo'
+  if (kind === 'journal') return 'Journal'
+  return page.course || 'Note'
 }
 
 function progressRow(a) {

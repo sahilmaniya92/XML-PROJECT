@@ -7,7 +7,7 @@ export function renderProfile(container, { profile, user, onSave, onUploadSyllab
       <header class="ws-hero ws-hero-compact">
         <button type="button" class="ws-back" data-action="back">← Dashboard</button>
         <h1 class="ws-title">Account & profile</h1>
-        <p class="ws-lead">Epic 1 — personalize your workspace and import syllabus dates.</p>
+        <p class="ws-lead">Update your details and import syllabus deadlines.</p>
       </header>
 
       <form class="ws-form" id="profile-form">
@@ -35,7 +35,7 @@ export function renderProfile(container, { profile, user, onSave, onUploadSyllab
           </label>
           <label class="ws-field">
             <span>University</span>
-            <input type="text" name="university" value="${escapeAttr(profile.university)}" placeholder="e.g. Ontario Tech University" />
+            <input type="text" name="university" value="${escapeAttr(profile.university)}" placeholder="e.g. Humber College" />
           </label>
           <label class="ws-field">
             <span>Semester</span>

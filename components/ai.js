@@ -6,7 +6,7 @@ export function renderAi(container, { onBack }) {
         <button type="button" class="ws-back" data-action="back">← Dashboard</button>
         <div>
           <h1 class="ws-title">AI</h1>
-          <p class="ws-lead">Ask questions about your notes. <strong>Coming soon</strong> — not connected yet.</p>
+          <p class="ws-lead">Ask questions about your notes. <strong>Coming soon</strong> — team feature in progress.</p>
         </div>
       </header>
 
@@ -14,8 +14,8 @@ export function renderAi(container, { onBack }) {
         <div class="ws-ai-empty">
           <span class="ws-ai-icon">✦</span>
           <h2>AI assistant</h2>
-          <p>This section is a <strong>shared team feature</strong> (Epic 4). UI shell is in place — full Gemini + note search will be wired by everyone together.</p>
-          <p class="ws-muted">When ready: grounded answers from your lecture notes using Gemini.</p>
+          <p>AI assistant for your lecture notes. The whole team will connect Gemini search later.</p>
+          <p class="ws-muted">When ready: grounded answers from your course notes.</p>
         </div>
 
         <form class="ws-chat-input ws-ai-disabled" id="ai-form">
