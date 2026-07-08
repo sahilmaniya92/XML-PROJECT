@@ -80,4 +80,4 @@ Open `components/editor.js` and explain:
 
 ---
 
-[← Main README](./README.md) · [Progress tracker](./project_progress_tracker.md)
+[← Main README](./README.md) · [Progress tracker](./project_progress_tracker.md) · [File map](./FILES.md)

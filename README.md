@@ -53,7 +53,8 @@ We have **9 sidebar screens** because the story map has 9 epics — not because 
 **Progress tracker:** [project_progress_tracker.md](./project_progress_tracker.md)  
 **User stories:** [user_stories.md](./user_stories.md)  
 **Timeline:** [mosco_timeline.md](./mosco_timeline.md) (June → August 2026)  
-**Professor / demo honesty:** [FOR_PROFESSOR.md](./FOR_PROFESSOR.md)
+**Professor / demo honesty:** [FOR_PROFESSOR.md](./FOR_PROFESSOR.md)  
+**File ownership & dependencies:** [FILES.md](./FILES.md)
 
 ## One demo per person
 

@@ -17,7 +17,8 @@ Say this:
 3. Epic 3 = when you pick a course, it saves on the page object in `state.js`.
 4. Flashcards (Epic 7) only **reads** `##` and `•` from that same text — partial, not finished.
 
-Full team honesty doc: [FOR_PROFESSOR.md](./FOR_PROFESSOR.md)
+Full team honesty doc: [FOR_PROFESSOR.md](./FOR_PROFESSOR.md)  
+File map (who owns what): [FILES.md](./FILES.md)
 
 ---
 
