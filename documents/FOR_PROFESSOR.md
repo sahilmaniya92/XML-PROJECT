@@ -52,26 +52,6 @@ Each person owns **their component file** and can explain it:
 
 ---
 
-## 60-second answer if asked "Did you use AI?"
-
-> "We used AI like Stack Overflow — to fix bugs and layout ideas.  
-> The **logic we demo** is ours: course dropdown on notes, Kanban columns, dashboard filters for today, reading `##` headings for exam prep.  
-> We kept the editor **simple on purpose** (textarea) so we can explain every line.  
-> AI chat is **not built** — that epic is for later weeks."
-
----
-
-## Show you understand the code (Parth example)
-
-Open `components/editor.js` and explain:
-
-1. We build HTML as a string and put it in the page (`container.innerHTML`).
-2. Course list comes from `utils/courses.js` — our real semester courses.
-3. On `input` / `change`, we call `onUpdatePage()` which saves to `state.js` → localStorage.
-4. Flashcards read the same plain text (`##` and `•`) — no magic.
-
----
-
 ## Why it looks "big"
 
 - **9 sidebar links** = story map coverage (screens exist), not 9 finished features.
