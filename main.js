@@ -11,19 +11,8 @@ import { renderAi } from './components/ai.js'
 import { renderAnalytics } from './components/analytics.js'
 import { renderFlashcards } from './components/flashcards.js'
 import { renderCalendarPlus } from './components/calendar.js'
-import {
-  renderCodeFusion,
-  getCodeFusionResponse,
-} from './components/codefusion.js'
 import { renderAuthModal } from './components/auth.js'
-import {
-  renderEventModal,
-  renderShareModal,
-  renderTemplatesModal,
-  renderTrashModal,
-  renderInboxPanel,
-  renderShortcutsModal,
-} from './components/modal.js'
+import { renderEventModal, renderTrashModal } from './components/modal.js'
 import {
   subscribe,
   getState,
@@ -35,17 +24,12 @@ import {
   toggleSidebar,
   toggleMobileSidebar,
   closeMobileSidebar,
-  toggleCodeFusion,
-  closeCodeFusion,
   createPage,
   updateActivePage,
   deletePage,
   restorePage,
   permanentDeletePage,
-  duplicatePage,
   toggleFavorite,
-  togglePrivateSection,
-  addCodeFusionMessage,
   openCalendarPlus,
   closeCalendarPlus,
   calendarPrevMonth,
@@ -55,18 +39,10 @@ import {
   calendarDeleteEvent,
   openAuthModal,
   closeAuthModal,
-  openShareModal,
-  closeShareModal,
-  openTemplatesModal,
-  closeTemplatesModal,
   openTrashModal,
   closeTrashModal,
-  openInboxModal,
-  closeInboxModal,
   openEventModal,
   closeEventModal,
-  openShortcutsModal,
-  closeShortcutsModal,
   setUser,
   loadFromSupabase,
   signOutUser,
@@ -76,7 +52,6 @@ import {
   openDbSetupModal,
   closeDbSetupModal,
   openFlashcards,
-  closeFlashcards,
   setActiveCourse,
   getDueFlashcards,
   generateFlashcardsFromPage,
@@ -111,7 +86,6 @@ import { renderDbSetupModal } from './components/dbSetup.js'
 import { isSupabaseConfigured } from './utils/supabase.js'
 
 let toastTimer
-let workspaceSyncInProgress = null
 
 function showToast(message) {
   let toast = document.getElementById('app-toast')
@@ -133,9 +107,9 @@ const FULLSCREEN_VIEWS = new Set([
 ])
 
 function renderWorkspaceView(state, activePage) {
-  const editor = document.getElementById('editor')
-  const roots = {
-    home: () => renderDashboard(editor, {
+  const root = document.getElementById('editor')
+  const views = {
+    home: () => renderDashboard(root, {
       profile: state.profile,
       assignments: state.assignments,
       pages: state.pages,
@@ -147,54 +121,50 @@ function renderWorkspaceView(state, activePage) {
       onOpenFlashcards: openFlashcards,
       onOpenProfile: openProfile,
     }),
-    profile: () => renderProfile(editor, {
+    profile: () => renderProfile(root, {
       profile: state.profile,
       user: state.user,
       onBack: openHome,
       onSave: (data) => { saveProfile(data); showToast('Profile saved') },
       onUploadSyllabus: (text) => {
         const n = parseAndImportSyllabus(text)
-        showToast(n ? `Imported ${n} dates to calendar` : 'No dates found — try lines like "Mar 15 Exam"')
+        showToast(n ? `Imported ${n} dates` : 'No dates found in text')
       },
       onGoogleSignIn: async () => {
-        try {
-          await signInWithGoogle()
-        } catch (e) {
-          showToast(e.message || 'Enable Google in Supabase Auth → Providers')
-        }
+        try { await signInWithGoogle() } catch (e) { showToast(e.message) }
       },
     }),
-    assignments: () => renderAssignments(editor, {
+    assignments: () => renderAssignments(root, {
       assignments: state.assignments,
       onBack: openHome,
-      onAdd: (data) => { addAssignment(data); showToast('Assignment added') },
-      onMove: (id, status) => moveAssignment(id, status),
+      onAdd: (data) => { addAssignment(data); showToast('Added') },
+      onMove: moveAssignment,
       onDelete: (id) => { deleteAssignment(id); showToast('Removed') },
     }),
-    planner: () => renderPlanner(editor, {
+    planner: () => renderPlanner(root, {
       studyPlan: state.studyPlan,
       onBack: openHome,
-      onGenerate: () => { generateStudyPlan(); showToast('Weekly plan generated') },
+      onGenerate: () => { generateStudyPlan(); showToast('Plan generated') },
     }),
-    exam: () => renderExamMode(editor, {
+    exam: () => renderExamMode(root, {
       activePage,
       flashcards: state.flashcards,
       onBack: openHome,
       onActivate: () => {
         const n = activateExamMode()
-        showToast(n ? `Exam mode: ${n} flashcards added` : 'Open a note with headings first')
+        showToast(n ? `${n} flashcards ready` : 'Open a note with ## headings first')
         openFlashcards()
       },
     }),
-    ai: () => renderAi(editor, { onBack: openHome }),
-    analytics: () => renderAnalytics(editor, {
+    ai: () => renderAi(root, { onBack: openHome }),
+    analytics: () => renderAnalytics(root, {
       studyLog: state.studyLog,
       assignments: state.assignments,
       pages: state.pages,
       onBack: openHome,
-      onLogStudy: () => { logStudyMinutes(30); showToast('Logged 30 min study time') },
+      onLogStudy: () => { logStudyMinutes(30); showToast('Logged 30 min') },
     }),
-    flashcards: () => renderFlashcards(editor, {
+    flashcards: () => renderFlashcards(root, {
       flashcards: state.flashcards,
       dueCount: getDueFlashcards(state.activeCourse).length,
       activeCourse: state.activeCourse,
@@ -202,15 +172,14 @@ function renderWorkspaceView(state, activePage) {
       onBack: openHome,
       onSetCourse: setActiveCourse,
       onGenerateFromNote: () => {
-        const page = getActivePage()
-        const count = generateFlashcardsFromPage(page.id)
-        showToast(count ? `Created ${count} flashcards` : 'Add ## headings or • bullets to your note')
+        const count = generateFlashcardsFromPage(getActivePage().id)
+        showToast(count ? `Created ${count} cards` : 'Add ## or • to your note')
       },
       onStartReview: () => {},
       onReview: (id, q) => reviewFlashcard(id, q),
       onDeleteCard: (id) => { deleteFlashcard(id); showToast('Removed') },
     }),
-    calendar: () => renderCalendarPlus(editor, {
+    calendar: () => renderCalendarPlus(root, {
       onBack: closeCalendarPlus,
       onPrevMonth: calendarPrevMonth,
       onNextMonth: calendarNextMonth,
@@ -219,43 +188,24 @@ function renderWorkspaceView(state, activePage) {
       onDeleteEvent: (id) => { calendarDeleteEvent(id); showToast('Event removed') },
     }),
   }
-
-  roots[state.activeView]?.()
+  views[state.activeView]?.()
 }
 
-function getModalRoots() {
+function renderModals(state, activePage) {
   let modalRoot = document.getElementById('modal-root')
   if (!modalRoot) {
     modalRoot = document.createElement('div')
     modalRoot.id = 'modal-root'
     modalRoot.innerHTML = `
       <div id="auth-modal-root"></div>
-      <div id="share-modal-root"></div>
-      <div id="templates-modal-root"></div>
       <div id="trash-modal-root"></div>
-      <div id="inbox-modal-root"></div>
       <div id="event-modal-root"></div>
-      <div id="shortcuts-modal-root"></div>
       <div id="db-setup-modal-root"></div>
     `
     document.body.appendChild(modalRoot)
   }
-  return {
-    auth: document.getElementById('auth-modal-root'),
-    share: document.getElementById('share-modal-root'),
-    templates: document.getElementById('templates-modal-root'),
-    trash: document.getElementById('trash-modal-root'),
-    inbox: document.getElementById('inbox-modal-root'),
-    event: document.getElementById('event-modal-root'),
-    shortcuts: document.getElementById('shortcuts-modal-root'),
-    dbSetup: document.getElementById('db-setup-modal-root'),
-  }
-}
 
-function renderModals(state, activePage) {
-  const roots = getModalRoots()
-
-  renderAuthModal(roots.auth, {
+  renderAuthModal(document.getElementById('auth-modal-root'), {
     open: state.authModalOpen,
     user: state.user,
     configured: isSupabaseConfigured,
@@ -265,18 +215,15 @@ function renderModals(state, activePage) {
     onOpenDbSetup: openDbSetupModal,
     onForceSync: async () => {
       const ok = await forceCloudSync()
-      showToast(ok ? 'Synced to database' : state.syncError ?? 'Sync failed')
+      showToast(ok ? 'Synced' : state.syncError ?? 'Sync failed')
     },
     onSignIn: async (email, password) => {
       const { data, error } = await signIn(email, password)
       if (error) throw new Error(formatAuthError(error))
-      if (!data.session?.user) {
-        throw new Error('Account created but no session — confirm email is OFF in Supabase, then sign in.')
-      }
       setUser(data.session.user)
       closeAuthModal()
-      showToast('Signed in — syncing your workspace')
-      queueWorkspaceSync(data.session.user.id, 'Signed in')
+      showToast('Signed in')
+      syncAfterLogin(data.session.user.id)
     },
     onSignUp: async (email, password) => {
       const { data, error } = await signUp(email, password)
@@ -284,84 +231,36 @@ function renderModals(state, activePage) {
       if (data.session?.user) {
         setUser(data.session.user)
         closeAuthModal()
-        showToast('Account created — syncing your workspace')
-        queueWorkspaceSync(data.session.user.id, 'Account ready')
+        syncAfterLogin(data.session.user.id)
       } else {
-        showToast('Account created! Now click Sign in with the same email and password.')
+        showToast('Account created — now sign in')
       }
     },
-    onSignOut: async () => {
-      await signOutUser()
-      showToast('Signed out')
-    },
+    onSignOut: async () => { await signOutUser(); showToast('Signed out') },
   })
 
-  renderShareModal(roots.share, {
-    open: state.shareModalOpen,
-    page: activePage,
-    onClose: closeShareModal,
-  })
-
-  renderTemplatesModal(roots.templates, {
-    open: state.templatesModalOpen,
-    onClose: closeTemplatesModal,
-    onSelectTemplate: (template) => {
-      createPage(template)
-      showToast(`Created page from "${template.title}" template`)
-    },
-  })
-
-  renderTrashModal(roots.trash, {
+  renderTrashModal(document.getElementById('trash-modal-root'), {
     open: state.trashModalOpen,
     trashedPages: getTrashedPages(),
     onClose: closeTrashModal,
-    onRestore: (id) => {
-      restorePage(id)
-      showToast('Page restored')
-    },
-    onPermanentDelete: (id) => {
-      permanentDeletePage(id)
-      showToast('Page permanently deleted')
-    },
+    onRestore: (id) => { restorePage(id); showToast('Restored') },
+    onPermanentDelete: (id) => { permanentDeletePage(id); showToast('Deleted') },
   })
 
-  renderInboxPanel(roots.inbox, {
-    open: state.inboxModalOpen,
-    pages: state.pages.filter((p) => !p.trashed),
-    onClose: closeInboxModal,
-    onSelectPage: (id) => {
-      setActivePage(id)
-      showToast('Opened from inbox')
-    },
-  })
-
-  renderEventModal(roots.event, {
+  renderEventModal(document.getElementById('event-modal-root'), {
     open: state.eventModalOpen,
     dateKey: state.selectedDateKey,
     onClose: closeEventModal,
-    onSubmit: (payload) => {
-      calendarAddEvent(payload)
-      showToast('Event added')
-    },
+    onSubmit: (payload) => { calendarAddEvent(payload); showToast('Event added') },
   })
 
-  renderShortcutsModal(roots.shortcuts, {
-    open: state.shortcutsModalOpen,
-    onClose: closeShortcutsModal,
-  })
-
-  renderDbSetupModal(roots.dbSetup, {
+  renderDbSetupModal(document.getElementById('db-setup-modal-root'), {
     open: state.dbSetupModalOpen,
     dbStatus: state.dbStatus,
     onClose: closeDbSetupModal,
     onTestConnection: async () => {
       const result = await checkDatabaseConnection()
-      if (result.ok) {
-        showToast('Database connected!')
-        if (state.user) await forceCloudSync()
-      } else {
-        showToast(result.message ?? 'Connection failed')
-      }
+      showToast(result.ok ? 'Connected' : result.message ?? 'Failed')
     },
   })
 }
@@ -373,28 +272,18 @@ function renderApp() {
 
   app.innerHTML = `
     <div class="app-shell ${state.sidebarOpen ? '' : 'sidebar-collapsed'}">
-      <div
-        class="mobile-backdrop ${state.mobileSidebarOpen ? 'is-open' : ''}"
-        data-action="close-mobile-sidebar"
-      ></div>
-
-      <aside
-        id="sidebar"
-        class="app-sidebar ${state.mobileSidebarOpen ? 'mobile-open' : ''}"
-      ></aside>
-
+      <div class="mobile-backdrop ${state.mobileSidebarOpen ? 'is-open' : ''}" data-action="close-mobile"></div>
+      <aside id="sidebar" class="app-sidebar ${state.mobileSidebarOpen ? 'mobile-open' : ''}"></aside>
       <div class="app-main">
         <header id="topbar"></header>
         <main id="editor" class="app-editor"></main>
       </div>
-
-      <div id="codefusion-root"></div>
     </div>
   `
 
   renderSidebar(document.getElementById('sidebar'), {
-    onSelectPage: (id) => { setActivePage(id) },
-    onNewPage: () => { createPage(); showToast('New note created') },
+    onSelectPage: setActivePage,
+    onNewPage: () => { createPage(); showToast('New note') },
     onSearch: setSearchQuery,
     onOpenCalendarPlus: openCalendarPlus,
     onOpenHome: openHome,
@@ -417,67 +306,18 @@ function renderApp() {
     topbar.style.display = ''
     renderTopbar(topbar, {
       activePage,
-      activeView: state.activeView,
-      syncStatus: state.syncStatus,
-      dbStatus: state.dbStatus,
-      syncError: state.syncError,
-      lastSyncedAt: state.lastSyncedAt,
       user: state.user,
       onToggleSidebar: toggleSidebar,
       onToggleMobileSidebar: toggleMobileSidebar,
-      onToggleCodeFusion: toggleCodeFusion,
-      onToggleFavorite: () => {
-        toggleFavorite(activePage.id)
-        showToast(activePage.favorite ? 'Removed from favorites' : 'Added to favorites')
-      },
-      onSave: () => showToast('All changes saved'),
-      onShare: openShareModal,
-      onOpenAuth: () => {
-        if (state.dbStatus === 'missing_table' || state.dbStatus === 'permission') {
-          openDbSetupModal()
-        } else {
-          openAuthModal()
-        }
-      },
-      onOpenDbSetup: openDbSetupModal,
-      onForceSync: async () => {
-        const ok = await forceCloudSync()
-        showToast(ok ? 'Synced to database' : getState().syncError ?? 'Sync failed — click sync pill for details')
-      },
-      onShowSyncError: (msg) => showToast(msg),
+      onToggleFavorite: () => toggleFavorite(activePage.id),
+      onOpenAuth: openAuthModal,
       onOpenHome: openHome,
-      onDuplicatePage: () => {
-        duplicatePage(activePage.id)
-        showToast('Page duplicated')
-      },
-      onDeletePage: () => {
-        deletePage(activePage.id)
-        showToast('Page moved to trash')
-      },
+      onDeletePage: () => { deletePage(activePage.id); showToast('Moved to trash') },
       onOpenTrash: openTrashModal,
-      onOpenCalendarPlus: openCalendarPlus,
-      onCopyContent: async () => {
-        try {
-          await navigator.clipboard.writeText(activePage.content || '')
-          showToast('Page content copied')
-        } catch {
-          showToast('Could not copy content')
-        }
-      },
-      onRemoveCover: () => {
-        updateActivePage({ cover: 'none' })
-        showToast('Cover removed')
-      },
-      onNewPage: () => {
-        createPage()
-        showToast('New page created')
-      },
-      onShowShortcuts: openShortcutsModal,
     })
     renderEditor(document.getElementById('editor'), {
       activePage,
-      onUpdatePage: (updates, options) => updateActivePage(updates, options),
-      onOpenCodeFusion: toggleCodeFusion,
+      onUpdatePage: updateActivePage,
       onToggleFavorite: () => toggleFavorite(activePage.id),
     })
   } else {
@@ -485,118 +325,58 @@ function renderApp() {
     openHome()
   }
 
-  renderCodeFusion(document.getElementById('codefusion-root'), {
-    open: state.codefusionOpen,
-    activePage,
-    messages: state.codefusionMessages,
-    onClose: closeCodeFusion,
-    onAction: (action, prompt) => {
-      addCodeFusionMessage('user', prompt)
-      setTimeout(() => {
-        addCodeFusionMessage('ai', getCodeFusionResponse(action, prompt))
-      }, 450)
-    },
-  })
-
   renderModals(state, activePage)
-
-  app.querySelector('[data-action="close-mobile-sidebar"]')?.addEventListener('click', closeMobileSidebar)
+  app.querySelector('[data-action="close-mobile"]')?.addEventListener('click', closeMobileSidebar)
 }
 
 subscribe(renderApp)
 renderApp()
 
-function queueWorkspaceSync(userId, successPrefix = 'Workspace') {
-  if (!userId || workspaceSyncInProgress === userId) return
-  workspaceSyncInProgress = userId
-
-  setTimeout(async () => {
-    try {
-      await checkDatabaseConnection()
-      const result = await loadFromSupabase(userId)
-      showToast(
-        result === 'uploaded'
-          ? `${successPrefix} — local data saved to cloud`
-          : result === 'merged-local'
-            ? `${successPrefix} — kept your latest local edits`
-            : `${successPrefix} — loaded from database`
-      )
-    } catch (err) {
-      const msg = formatDatabaseError(err) || err.message || 'Could not sync with database'
-      showToast(msg.includes('does not exist') ? 'Create workspaces table first (click sync pill)' : msg)
-      if (msg.includes('does not exist') || msg.includes('permission') || msg.includes('policy')) {
-        openDbSetupModal()
-      }
-    } finally {
-      if (workspaceSyncInProgress === userId) {
-        workspaceSyncInProgress = null
-      }
-    }
-  }, 0)
+async function syncAfterLogin(userId) {
+  try {
+    await checkDatabaseConnection()
+    await loadFromSupabase(userId)
+    showToast('Workspace synced')
+  } catch (err) {
+    showToast(formatDatabaseError(err) || 'Sync failed')
+  }
 }
 
-// Initialize Supabase session + database check
 async function initSupabase() {
   if (!isSupabaseConfigured) return
-
   await checkDatabaseConnection()
-
   const session = await getSession()
   if (session?.user) {
     setUser(session.user)
-    queueWorkspaceSync(session.user.id, 'Restored session')
+    syncAfterLogin(session.user.id)
   }
 }
 
 initSupabase()
 
-// Supabase auth listener — never await here (causes sign-in deadlock)
 onAuthStateChange((event, session) => {
   if (isSigningOut() && event !== 'SIGNED_OUT') return
-
   if (event === 'SIGNED_OUT') {
     setUser(null)
     closeAuthModal()
-    setTimeout(() => {
-      checkDatabaseConnection()
-    }, 0)
     return
   }
-
   if (event === 'SIGNED_IN' && session?.user) {
     setUser(session.user)
-    queueWorkspaceSync(session.user.id, 'Signed in')
+    syncAfterLogin(session.user.id)
   }
 })
 
-// Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.key === 'n') {
     e.preventDefault()
     createPage()
-    showToast('New page created')
-  }
-  if (e.ctrlKey && e.key === 's') {
-    e.preventDefault()
-    showToast('All changes saved')
+    showToast('New note')
   }
   if (e.key === 'Escape') {
-    closeCodeFusion()
     closeAuthModal()
-    closeShareModal()
-    closeTemplatesModal()
     closeTrashModal()
-    closeInboxModal()
     closeEventModal()
-    closeShortcutsModal()
+    closeDbSetupModal()
   }
 })
-
-// Deep link: ?page=page-id
-const pageParam = new URLSearchParams(window.location.search).get('page')
-if (pageParam) {
-  const state = getState()
-  if (state.pages.some((p) => p.id === pageParam && !p.trashed)) {
-    setActivePage(pageParam)
-  }
-}

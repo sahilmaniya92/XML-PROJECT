@@ -4,6 +4,7 @@
 |---|---|
 | **Student ID** | N01779255 |
 | **Epics** | 3 (Notes), 7 (Flashcards) |
+| **Branch** | `parth` — simplified student-style code |
 
 ---
 
@@ -18,10 +19,10 @@
 1. Sidebar → open **xml/Js — XML & JavaScript lecture**
 2. Point at the blue bar: **Linked to xml/Js · Week 3 — XML, DOM & JSON**
 3. Show **Course** dropdown + **Lecture** field (change course → saves automatically)
-4. Type under `## Key concepts` to prove editing works
+4. Type in the **text area** under `## Key concepts` — plain text, no fancy blocks
 5. Sidebar shows **xml/Js** badge next to the note name
 
-**Files you own:** `components/editor.js`, `utils/courses.js`, `components/modal.js` (lecture template)
+**Files you own:** `components/editor.js`, `utils/courses.js`
 
 ---
 
@@ -31,17 +32,17 @@
 
 ---
 
-## Technical notes
+## Technical notes (simple on purpose)
 
-- Notes stored as plain text with `##` headings and `•` bullets
-- `course` + `lecture` fields on each page object in `state.js`
-- New pages inherit the active course automatically
+- Notes are **plain text** in a `<textarea>` — easy to read and explain to professor
+- Use `##` for headings and `•` for bullets (flashcards read this)
+- `course` + `lecture` saved on each page in `state.js`
 
 ---
 
 ## Shared — Epic 4 AI (whole team)
 
-**AI assistant** → Sidebar → **AI** — UI shell in `components/ai.js`; full feature is a **team effort** (notes context, API, UI).
+**AI assistant** → Sidebar → **AI** — UI shell only for now
 
 ---
 
