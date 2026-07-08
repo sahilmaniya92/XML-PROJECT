@@ -1,4 +1,4 @@
-# For Professor — Honest Project Scope
+# Project Scope
 
 **Student Workspace** · 4 students · XML & JavaScript course · Humber College  
 This is a **story-map MVP**, not a finished commercial app.
