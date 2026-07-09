@@ -1,12 +1,3 @@
-# Who owns which file
-
-Quick reference so we don't step on each other's code.  
-`parth` branch — simplified MVP (textarea editor, no block editor).
-
-Personal guides: [Dhruv](./README-DHRUV.md) · [Parth](./README-PARTH.md) · [Kelvin](./README-KELVIN.md) · [Sahil](./README-SAHIL.md)
-
----
-
 ## Team
 
 | Person | ID | Epics | Main files |
