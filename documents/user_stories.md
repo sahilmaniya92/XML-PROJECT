@@ -127,6 +127,4 @@ What works now: 7-day bar chart, assignment count, log study time button.
 
 ---
 
-Status: ✅ done for demo · 🟡 partial · ⬜ not built
-
 [Progress tracker](./project_progress_tracker.md) · [Timeline](./mosco_timeline.md) · [Main README](../README.md)
