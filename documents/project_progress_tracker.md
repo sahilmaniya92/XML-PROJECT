@@ -13,12 +13,6 @@ Last updated: July 8, 2026
 | **Basic / partial** | **4** | Screen exists and does something simple, not fully polished |
 | **Placeholder (team)** | **1** | UI shell in place — Epic 4 AI built by **whole team** |
 
-**Coverage score**
-
-- Epics with a working screen: **9 / 9** (AI has placeholder UI)
-- Epics demo-ready for presentation: **~4–5 / 9**
-- One story per teammate ready: **4 / 4** (Dhruv, Parth, Kelvin, Sahil via Exam prep)
-
 ---
 
 ## By person (who owns what)
