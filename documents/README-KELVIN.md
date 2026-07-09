@@ -10,11 +10,6 @@
 ### Epic 5 — Track progress on a Kanban board
 
 > *"As a student, I update task completion using a Kanban board (To do → In progress → Done)."*
-1. Sidebar → **Assignments**
-2. Show 3 columns with cards already loaded
-3. Click **In progress** on a "To do" card → card moves column
-4. Click **Mark done** → card moves to Done (strikethrough)
-5. Add new assignment using the form at top (title + date) → appears in **To do**
 
 **My Files:** `components/assignments.js`, assignment state in `utils/state.js`
 
