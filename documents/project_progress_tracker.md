@@ -1,7 +1,7 @@
 # Project Progress Tracker
 
 **Student Workspace** — 4-week MVP story map status  
-Last updated: July 7, 2026
+Last updated: July 8, 2026
 
 ---
 
@@ -9,11 +9,11 @@ Last updated: July 7, 2026
 
 | Status | Count | Meaning |
 |--------|-------|---------|
-| ✅ **Demo-ready** | **4** | One polished story per teammate — works for professor demo |
-| 🟡 **Basic / partial** | **4** | Screen exists and does something simple, not fully polished |
-| ⬜ **Placeholder (team)** | **1** | UI shell in place — Epic 4 AI built by **whole team** |
+| **Demo-ready** | **4** | One polished story per teammate — works for professor demo |
+| **Basic / partial** | **4** | Screen exists and does something simple, not fully polished |
+| **Placeholder (team)** | **1** | UI shell in place — Epic 4 AI built by **whole team** |
 
-**Coverage score (honest)**
+**Coverage score**
 
 - Epics with a working screen: **9 / 9** (AI has placeholder UI)
 - Epics demo-ready for presentation: **~4–5 / 9**
@@ -25,15 +25,15 @@ Last updated: July 7, 2026
 
 | Person | Student ID | Epic | User story | Status |
 |--------|------------|------|------------|--------|
-| **Dhruv Patel** | N10015893 | 2 | View today's schedule | ✅ **Done** |
-| **Dhruv Patel** | N10015893 | 1 | Profile + sign-in + syllabus | 🟡 **Partial** |
-| **Parth Patel** | N01779255 | 3 | Notes linked to course + lecture | ✅ **Done** |
-| **Parth Patel** | N01779255 | 7 | Flashcards from notes | 🟡 **Partial** |
-| **Kelvin Idoko** | N01777723 | 5 | Kanban assignment tracking | ✅ **Done** |
-| **Kelvin Idoko** | N01777723 | 6 | Weekly study planner | 🟡 **Partial** |
-| **Sahil Maniya** | N01769967 | 8 | One-click exam prep | 🟡 **Partial** |
-| **Sahil Maniya** | N01769967 | 9 | Study analytics | 🟡 **Partial** |
-| **Whole team** | — | 4 | AI answers from notes | ⬜ **Placeholder** (shared) |
+| **Dhruv Patel** | N10015893 | 2 | View today's schedule | **Done** |
+| **Dhruv Patel** | N10015893 | 1 | Profile + sign-in + syllabus | **Partial** |
+| **Parth Patel** | N01779255 | 3 | Notes linked to course + lecture | **Done** |
+| **Parth Patel** | N01779255 | 7 | Flashcards from notes | **Partial** |
+| **Kelvin Idoko** | N01777723 | 5 | Kanban assignment tracking | **Done** |
+| **Kelvin Idoko** | N01777723 | 6 | Weekly study planner | **Partial** |
+| **Sahil Maniya** | N01769967 | 8 | One-click exam prep | **Partial** |
+| **Sahil Maniya** | N01769967 | 9 | Study analytics | **Partial** |
+| **Whole team** | — | 4 | AI answers from notes | **Placeholder** (shared) |
 
 > **Epic 4 (AI)** is not owned by one person — **Dhruv, Parth, Sahil, and Kelvin** all contribute.
 
@@ -55,7 +55,7 @@ Last updated: July 7, 2026
 
 ## All 9 epics — detail
 
-### ✅ Fully working (good for demo)
+### Fully working (good for demo)
 
 #### Epic 2 — Today's dashboard (`Today`)
 - Today's schedule (calendar + due assignments)
@@ -74,7 +74,7 @@ Last updated: July 7, 2026
 
 ---
 
-### 🟡 Built but basic (not fully polished)
+### Built but basic (not fully polished)
 
 #### Epic 1 — Account & profile (`Profile`)
 - Name, university, semester, enrolled courses
@@ -106,7 +106,7 @@ Last updated: July 7, 2026
 
 ---
 
-### ⬜ Placeholder — whole team (Epic 4)
+### Placeholder — whole team (Epic 4)
 
 #### Epic 4 — AI (`AI`)
 - Sidebar link + screen layout done
@@ -128,8 +128,8 @@ Last updated: July 7, 2026
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| **Calendar** | 🟡 Partial | Add/delete events |
-| **Supabase sync** | 🟡 Partial | Sign in → data syncs to cloud |
+| **Calendar** | Partial | Add/delete events |
+| **Supabase sync** | Partial | Sign in → data syncs to cloud |
 | **CodeFusion panel** | Legacy | Old note-side AI panel (separate from Epic 4) |
 | **Search, trash, templates** | Basic | Note utilities |
 
@@ -144,7 +144,7 @@ Last updated: July 7, 2026
  
 ---
 
-## Next steps (suggested)
+## Next steps
 
 - [ ] Wire Epic 4 AI (Gemini + note search) — **whole team**
 - [ ] Fix flashcard duplicate generation — Parth
