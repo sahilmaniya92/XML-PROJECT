@@ -51,7 +51,7 @@ Profile, planner, flashcards, analytics — there but basic. AI — placeholder.
 
 ---
 
-## If you ask about AI tools
+## AI tools
 
 We used ChatGPT / Cursor sometimes to fix bugs or CSS — same as asking a friend or Stack Overflow.
 
