@@ -3,9 +3,8 @@
 Simple academic app: notes, today's dashboard, assignments, flashcards, calendar.  
 Data saves in **browser localStorage**. Sign in to sync one JSON row to **Supabase**.
 
-> **For professor:** This is a **story-map MVP**, not a finished product.  
+> This is a **story-map MVP**, not a finished product.  
 > **4 features** are demo-ready (one per teammate). **AI is not built** (placeholder only).  
-> See **[FOR_PROFESSOR.md](./documents/FOR_PROFESSOR.md)** for honest scope and how to present.
 
 ## Honest scope (read this first)
 
