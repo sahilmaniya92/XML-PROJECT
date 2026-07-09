@@ -65,8 +65,6 @@ We have **9 sidebar screens** because the story map has 9 epics — not because 
 | **Kelvin** | Kanban assignment tracking | **Assignments** → move cards |
 | **All** | AI section (shell) | **AI** → coming soon |
 
-> First open loads demo data (assignments, calendar events — no default notes).
-
 ## Run
 
 ```bash
