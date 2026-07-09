@@ -119,8 +119,4 @@ Vanilla JS, Vite, Tailwind v4, localStorage, Supabase optional.
 
 ---
 
-## Personal guides
-
-[Dhruv](./README-DHRUV.md) · [Parth](./README-PARTH.md) · [Kelvin](./README-KELVIN.md) · [Sahil](./README-SAHIL.md)
-
 [← Main README](../README.md)
