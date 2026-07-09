@@ -10,9 +10,9 @@ Data saves in **browser localStorage**. Sign in to sync one JSON row to **Supaba
 
 | Level | Count | Examples |
 |-------|-------|----------|
-| ✅ Demo-ready | **4** | Today dashboard, notes+course link, Kanban, exam prep |
-| 🟡 Basic / partial | **4** | Profile, planner, flashcards, analytics |
-| ⬜ Placeholder | **1** | AI screen (team — not connected) |
+| Demo-ready | **4** | Today dashboard, notes+course link, Kanban, exam prep |
+| Basic / partial | **4** | Profile, planner, flashcards, analytics |
+| Placeholder | **1** | AI screen (team — not connected) |
 
 We have **9 sidebar screens** because the story map has 9 epics — not because all 9 are finished.
 
