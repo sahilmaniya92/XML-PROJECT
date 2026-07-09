@@ -1,83 +1,81 @@
-# For Professor — Honest Project Scope
+# Notes for professor
 
-**Student Workspace** · 4 students · XML & JavaScript course · Humber College  
-This is a **story-map MVP**, not a finished commercial app.
+**Student Workspace** — Dhruv, Parth, Kelvin, Sahil · XML & JavaScript · Humber College
 
----
-
-## What we are NOT claiming
-
-- We did **not** build a full Notion clone or a real AI product.
-- We did **not** finish all 9 epics — the story map is the **plan**; the app is **week 3–4 progress**.
-- Epic 4 (AI) is a **placeholder screen only** — no Gemini API, no chat logic.
+This is our story-map MVP from weeks 3–4. Not a finished app.
 
 ---
 
-## What IS actually working (demo these 4)
+## What to expect
 
-| Student | ID | Epic | What to click | What it does |
-|---------|-----|------|---------------|--------------|
-| Dhruv Patel | N10015893 | 2 | **Today** | Shows today's events, due assignments, simple stats |
-| Parth Patel | N01779255 | 3 | **+ Note** in sidebar | Course dropdown + lecture field + plain `<textarea>` notes |
-| Kelvin Idoko | N01777723 | 5 | **Assignments** | Kanban: drag cards To do → In progress → Done |
-| Sahil Maniya | N01769967 | 8 | **Exam prep** | Reads `##` and `•` from open note (basic) |
-
-Everything else (planner, analytics, flashcards review, profile sync) = **partial** or **basic UI**.
+- Not a Notion clone. We stripped the fancy block editor on purpose.
+- Not a real AI product. The AI page is layout only — no API hooked up.
+- 9 sidebar screens = our plan on paper. About 4 are demo-ready.
 
 ---
 
-## Tech we used (from class concepts)
+## What to click in the demo
 
-- **Vanilla JavaScript** — `innerHTML`, `addEventListener`, modules (`import`/`export`)
-- **DOM** — one screen at a time, re-render on state change
-- **localStorage** — save notes and assignments in the browser
-- **Supabase** (optional) — one JSON row per user when signed in
-- **Vite** — dev server only (like Create React App but simpler)
+| Student | ID | Click | What happens |
+|---------|-----|-------|--------------|
+| Dhruv Patel | N10015893 | **Today** | Today's schedule, due assignments, quick stats |
+| Parth Patel | N01779255 | **+ Note** | Course dropdown, lecture field, plain textarea |
+| Kelvin Idoko | N01777723 | **Assignments** | Kanban — move cards between columns |
+| Sahil Maniya | N01769967 | **Exam prep** | Reads `##` headings and `•` bullets from your open note |
 
-No React. No TypeScript. Notes use a **plain textarea**, not a rich editor.
+Profile, planner, flashcards, analytics — there but basic. AI — placeholder.
 
 ---
 
-## How we split the work
+## Tech (stuff from class)
 
-Each person owns **their component file** and can explain it:
+- Vanilla JS — modules, `innerHTML`, `addEventListener`
+- One screen at a time, re-render when state changes
+- `localStorage` for saving
+- Supabase optional — one JSON row per user
+- Vite for dev server
+- No React, no TypeScript
+- Notes = plain `<textarea>`, not a rich editor
+
+---
+
+## Who wrote what
 
 | Person | Main files |
 |--------|------------|
-| Dhruv | `components/dashboard.js`, `components/profile.js` |
-| Parth | `components/editor.js`, `utils/courses.js`, `components/flashcards.js` |
-| Kelvin | `components/assignments.js`, `components/studyPlanner.js` |
-| Sahil | `components/examMode.js`, `components/analytics.js` |
-| Shared | `main.js` (wires screens), `utils/state.js` (save/load data) |
+| Dhruv | `dashboard.js`, `profile.js`, `auth.js` |
+| Parth | `editor.js`, `courses.js`, `flashcards.js` |
+| Kelvin | `assignments.js`, `studyPlanner.js` |
+| Sahil | `examMode.js`, `analytics.js` |
+| Everyone | `main.js`, `state.js`, `sidebar.js` |
 
 ---
 
-## 60-second answer if asked "Did you use AI?"
+## If you ask about AI tools
 
-> "We used AI like Stack Overflow — to fix bugs and layout ideas.  
-> The **logic we demo** is ours: course dropdown on notes, Kanban columns, dashboard filters for today, reading `##` headings for exam prep.  
-> We kept the editor **simple on purpose** (textarea) so we can explain every line.  
-> AI chat is **not built** — that epic is for later weeks."
+We used ChatGPT / Cursor sometimes to fix bugs or CSS — same as asking a friend or Stack Overflow.
 
----
+The parts we demo are code we can walk through line by line: course dropdown saves to `state.js`, Kanban columns, dashboard filters for today, exam prep parsing `##` from note text.
 
-## Show you understand the code (Parth example)
-
-Open `components/editor.js` and explain:
-
-1. We build HTML as a string and put it in the page (`container.innerHTML`).
-2. Course list comes from `utils/courses.js` — our real semester courses.
-3. On `input` / `change`, we call `onUpdatePage()` which saves to `state.js` → localStorage.
-4. Flashcards read the same plain text (`##` and `•`) — no magic.
+We kept the editor as a textarea so we can actually explain it in class. The AI chat feature isn't built — that's August.
 
 ---
 
-## Why it looks "big"
+## Example: Parth explaining `editor.js`
 
-- **9 sidebar links** = story map coverage (screens exist), not 9 finished features.
-- **Demo seed data** (`utils/seedDemo.js`) loads sample assignments/calendar on first open (no default notes on `parth`).
-- Old CSS from earlier experiments is still in `styles.css` — we simplified the editor, not deleted every old style rule.
+1. We build HTML as a string and drop it in with `container.innerHTML`
+2. Courses come from `utils/courses.js` — our real semester list
+3. On `input` / `change` we call `onUpdatePage()` → saves to `state.js` → `localStorage`
+4. Flashcards read the same text (`##` and `•`) — no separate database
 
 ---
 
-[← Main README](../README.md) · [Progress tracker](./project_progress_tracker.md) · [File map](./FILES.md)
+## Why the repo looks bigger than it is
+
+- Old CSS and unused utils are still in the repo from earlier experiments
+- `seedDemo.js` loads sample assignments + calendar on first open (no default notes)
+- 9 epic screens exist as UI shells even if the logic is thin
+
+---
+
+[← Main README](../README.md) · [Progress](./project_progress_tracker.md) · [Files](./FILES.md)

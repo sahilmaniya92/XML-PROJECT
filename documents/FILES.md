@@ -1,278 +1,133 @@
-# File ownership & dependencies
+# Who owns which file
 
-**Student Workspace** · `parth` branch (simplified MVP)  
-Who works on which file, and what each file needs from other files.
+Quick reference so we don't step on each other's code.  
+`parth` branch — simplified MVP (textarea editor, no block editor).
 
----
-
-## Team at a glance
-
-| Person | Student ID | Epics | Primary files |
-|--------|------------|-------|----------------|
-| **Dhruv Patel** | N10015893 | 1, 2 | `dashboard.js`, `profile.js`, `auth.js` |
-| **Parth Patel** | N01779255 | 3, 7 | `editor.js`, `courses.js`, `flashcards.js` |
-| **Kelvin Idoko** | N01777723 | 5, 6 | `assignments.js`, `studyPlanner.js`, `planner.js` |
-| **Sahil Maniya** | N01769967 | 8, 9 | `examMode.js`, `analytics.js` |
-| **Whole team** | — | 4 | `ai.js` (placeholder) |
-| **Shared** | — | — | `main.js`, `state.js`, `sidebar.js`, `topbar.js`, `styles.css` |
-
-Personal demo guides: [README-DHRUV](./README-DHRUV.md) · [README-PARTH](./README-PARTH.md) · [README-KELVIN](./README-KELVIN.md) · [README-SAHIL](./README-SAHIL.md)
+Personal guides: [Dhruv](./README-DHRUV.md) · [Parth](./README-PARTH.md) · [Kelvin](./README-KELVIN.md) · [Sahil](./README-SAHIL.md)
 
 ---
 
-## Ownership by file
+## Team
 
-### Entry & shell (shared)
+| Person | ID | Epics | Main files |
+|--------|-----|-------|------------|
+| Dhruv | N10015893 | 1, 2 | `dashboard.js`, `profile.js`, `auth.js` |
+| Parth | N01779255 | 3, 7 | `editor.js`, `courses.js`, `flashcards.js` |
+| Kelvin | N01777723 | 5, 6 | `assignments.js`, `studyPlanner.js`, `planner.js` |
+| Sahil | N01769967 | 8, 9 | `examMode.js`, `analytics.js` |
+| Team | — | 4 | `ai.js` |
+| Everyone | — | — | `main.js`, `state.js`, `sidebar.js`, `topbar.js`, `styles.css` |
 
-| File | Owner | Role | Status |
-|------|-------|------|--------|
-| `main.js` | **Shared** (all) | Imports every screen, wires sidebar/topbar, calls `state.js` | Active |
-| `index.html` | **Shared** | App mount point, loads `main.js` | Active |
-| `styles/styles.css` | **Shared** | All UI styles (Humber orange theme on `parth`) | Active |
-| `vite.config.js` | **Shared** | Dev server / build | Active |
-| `package.json` | **Shared** | npm scripts, Vite + Tailwind + Supabase deps | Active |
+---
 
-### Components — by person
+## Components
 
-| File | Owner | Epic | Depends on |
-|------|-------|------|------------|
-| `components/dashboard.js` | **Dhruv** | 2 | `utils/shared.js`, `state.js` (assignments, pages, calendar, flashcards, studyLog) |
-| `components/profile.js` | **Dhruv** | 1 | `utils/courses.js`, `utils/shared.js`, `state.js` (profile, syllabus) |
-| `components/auth.js` | **Dhruv** | 1 | `state.js`, `utils/supabase.js` |
-| `components/dbSetup.js` | **Dhruv** | 1 | Supabase connection helpers |
-| `components/calendar.js` | **Dhruv** (lead) | 2 / calendar | `utils/calendar.js`, `state.js` |
-| `components/editor.js` | **Parth** | 3 | `utils/courses.js`, `utils/shared.js`, `state.js` (pages) |
-| `components/flashcards.js` | **Parth** | 7 | `utils/courses.js`, `state.js`, `utils/flashcards.js` |
-| `components/assignments.js` | **Kelvin** | 5 | `utils/courses.js`, `utils/shared.js`, `state.js` (assignments) |
-| `components/studyPlanner.js` | **Kelvin** | 6 | `utils/shared.js`, `state.js` (studyPlan) |
-| `components/examMode.js` | **Sahil** | 8 | `utils/shared.js`, `utils/flashcards.js`, `state.js` (active page) |
-| `components/analytics.js` | **Sahil** | 9 | `utils/shared.js`, `state.js` (studyLog, assignments, pages) |
-| `components/ai.js` | **Team** | 4 | `state.js` only (UI shell, not connected) |
-| `components/sidebar.js` | **Shared** | — | `state.js` (nav, pages, search) |
-| `components/topbar.js` | **Shared** | — | `utils/shared.js`, `state.js` (active page) |
-| `components/modal.js` | **Shared** | — | Trash + event modals used from `main.js` |
+| File | Who | Epic | Needs |
+|------|-----|------|-------|
+| `dashboard.js` | Dhruv | 2 | `state.js`, `shared.js` |
+| `profile.js` | Dhruv | 1 | `courses.js`, `state.js` |
+| `auth.js` | Dhruv | 1 | `state.js`, `supabase.js` |
+| `calendar.js` | Dhruv | — | `calendar.js` utils, `state.js` |
+| `editor.js` | Parth | 3 | `courses.js`, `state.js` |
+| `flashcards.js` | Parth | 7 | `flashcards.js` utils, `state.js` |
+| `assignments.js` | Kelvin | 5 | `courses.js`, `state.js` |
+| `studyPlanner.js` | Kelvin | 6 | `planner.js`, `state.js` |
+| `examMode.js` | Sahil | 8 | `flashcards.js` utils, `state.js` |
+| `analytics.js` | Sahil | 9 | `state.js` |
+| `ai.js` | Team | 4 | `state.js` (shell only) |
+| `sidebar.js` | Shared | — | `state.js` |
+| `topbar.js` | Shared | — | `state.js` |
+| `modal.js` | Shared | — | used from `main.js` |
 
-### Utils — by person / shared
+---
 
-| File | Owner | Used by | Role |
-|------|-------|---------|------|
-| `utils/state.js` | **Shared** (touch carefully) | Almost everything | Single source of truth: pages, assignments, sync, navigation |
-| `utils/persistence.js` | **Shared** | `state.js` | localStorage read/write |
-| `utils/seedDemo.js` | **Shared** | `state.js` | Demo assignments/calendar on first open (no default notes on `parth`) |
-| `utils/shared.js` | **Shared** | Most components | `escapeHtml`, dates, small helpers |
-| `utils/courses.js` | **Parth** | `editor.js`, `profile.js`, `assignments.js`, `flashcards.js`, `state.js` | Semester course list |
-| `utils/flashcards.js` | **Parth** | `state.js`, `flashcards.js`, `examMode.js` | Generate cards from note text, spaced repetition |
-| `utils/planner.js` | **Kelvin** | `state.js` | Weekly study plan generator |
-| `utils/syllabus.js` | **Dhruv** | `state.js` | Parse syllabus text → calendar dates |
-| `utils/calendar.js` | **Dhruv** | `state.js`, `calendar.js` | Month grid + events |
-| `utils/supabase.js` | **Shared** | `supabaseSync.js`, `auth.js` | Supabase client config |
-| `utils/supabaseSync.js` | **Shared** | `state.js` | Cloud save/load one JSON workspace |
+## Utils
 
-### Docs (planning — not runtime)
+| File | Who | What it does |
+|------|-----|--------------|
+| `state.js` | Shared — be careful | All app data, navigation, save/load |
+| `persistence.js` | Shared | localStorage |
+| `seedDemo.js` | Shared | Demo assignments + calendar on first open |
+| `shared.js` | Shared | `escapeHtml`, date helpers |
+| `courses.js` | Parth | Our semester course list |
+| `flashcards.js` | Parth | Parse notes → cards, spaced repetition |
+| `planner.js` | Kelvin | Weekly plan generator |
+| `syllabus.js` | Dhruv | Syllabus text → dates |
+| `calendar.js` | Dhruv | Month grid |
+| `supabase.js` | Shared | Supabase client |
+| `supabaseSync.js` | Shared | Cloud save one JSON workspace |
 
-| File | Owner |
-|------|-------|
-| `documents/user_stories.md` | Whole team |
-| `documents/project_progress_tracker.md` | Whole team |
-| `documents/mosco_timeline.md` | Whole team |
-| `documents/FOR_PROFESSOR.md` | Whole team |
-| `documents/FILES.md` | Whole team (this file) |
+---
 
-### Not used on `parth` branch (old experiments — safe to ignore)
+## Planning docs (this folder)
+
+`user_stories.md`, `project_progress_tracker.md`, `mosco_timeline.md`, `FOR_PROFESSOR.md`, `FILES.md` — whole team
+
+---
+
+## Old files — ignore on `parth`
 
 | File | Note |
 |------|------|
-| `components/codefusion.js` | Removed — old AI panel |
-| `components/home.js` | Removed — replaced by `dashboard.js` |
-| `utils/blockEditor.js` | Not imported — old Notion-style editor |
-| `utils/slashMenu.js` | Not imported |
-| `utils/covers.js` | Not imported |
-| `utils/dropdown.js` | Not imported on simplified topbar |
+| `codefusion.js` | Deleted |
+| `home.js` | Deleted |
+| `blockEditor.js` | Not imported |
+| `slashMenu.js` | Not imported |
+| `covers.js` | Not imported |
 
 ---
 
-## Dependency map (how files connect)
+## How data flows (simplified)
 
-```mermaid
-flowchart TB
-  subgraph entry [Entry]
-    index[index.html]
-    main[main.js]
-    css[styles.css]
-  end
+```
+index.html → main.js
+  → sidebar, topbar, screens (dashboard, editor, etc.)
+  → state.js
+      → persistence.js (localStorage)
+      → seedDemo.js
+      → supabaseSync.js (optional)
+```
 
-  subgraph shell [Shell - Shared]
-    sidebar[sidebar.js]
-    topbar[topbar.js]
-  end
+**Parth's note path:**
+```
+editor.js → courses.js, shared.js
+onUpdatePage() → state.js → localStorage
+```
 
-  subgraph state_layer [Data layer - Shared]
-    state[state.js]
-    persist[persistence.js]
-    seed[seedDemo.js]
-    supaSync[supabaseSync.js]
-  end
+**Kelvin's Kanban:**
+```
+assignments.js → state.js (addAssignment, moveAssignment)
+```
 
-  subgraph dhruv [Dhruv]
-    dash[dashboard.js]
-    prof[profile.js]
-    auth[auth.js]
-    calUI[calendar.js]
-    syl[syllabus.js]
-    calUtil[calendar.js utils]
-  end
-
-  subgraph parth [Parth]
-    editor[editor.js]
-    courses[courses.js]
-    fcUI[flashcards.js]
-    fcUtil[flashcards.js utils]
-  end
-
-  subgraph kelvin [Kelvin]
-    asgn[assignments.js]
-    planUI[studyPlanner.js]
-    planUtil[planner.js]
-  end
-
-  subgraph sahil [Sahil]
-    exam[examMode.js]
-    analytics[analytics.js]
-  end
-
-  subgraph team [Team]
-    ai[ai.js]
-  end
-
-  index --> main
-  main --> css
-  main --> sidebar
-  main --> topbar
-  main --> state
-  main --> dash
-  main --> prof
-  main --> editor
-  main --> asgn
-  main --> planUI
-  main --> exam
-  main --> analytics
-  main --> fcUI
-  main --> ai
-  main --> calUI
-  main --> auth
-
-  state --> persist
-  state --> seed
-  state --> supaSync
-  state --> courses
-  state --> fcUtil
-  state --> planUtil
-  state --> syl
-  state --> calUtil
-
-  sidebar --> state
-  topbar --> state
-  dash --> state
-  prof --> courses
-  editor --> courses
-  asgn --> courses
-  fcUI --> courses
-  exam --> fcUtil
-  seed --> courses
+**Sahil's exam:**
+```
+examMode.js → flashcards.js utils → reads open page from state.js
 ```
 
 ---
 
-## Import chains (simple)
+## Rules we agreed on
 
-### Parth — notes path (Epic 3)
-
-```
-main.js
-  → components/editor.js
-      → utils/courses.js          (course dropdown)
-      → utils/shared.js           (escape HTML)
-  → utils/state.js
-      → updateActivePage()        (saves page.course, page.lecture, page.content)
-      → utils/persistence.js      (localStorage)
-```
-
-### Parth — flashcards path (Epic 7)
-
-```
-main.js
-  → components/flashcards.js
-  → utils/state.js
-      → generateFlashcardsFromPage()
-          → utils/flashcards.js   (reads ## and • from note text)
-```
-
-### Kelvin — assignments (Epic 5)
-
-```
-main.js
-  → components/assignments.js
-      → utils/courses.js
-  → utils/state.js
-      → addAssignment() / moveAssignment() / deleteAssignment()
-```
-
-### Sahil — exam prep (Epic 8)
-
-```
-main.js
-  → components/examMode.js
-      → utils/flashcards.js       (same parser as Epic 7)
-  → utils/state.js
-      → getActivePage()           (needs a note open with ## headings)
-```
-
-### Dhruv — dashboard (Epic 2)
-
-```
-main.js
-  → components/dashboard.js
-  → utils/state.js
-      → assignments, calendarEvents, pages, flashcards, studyLog
-```
-
-### Dhruv — profile + sync (Epic 1)
-
-```
-main.js
-  → components/profile.js
-  → components/auth.js
-  → utils/state.js
-      → saveProfile() / parseAndImportSyllabus()
-      → utils/syllabus.js
-      → utils/supabaseSync.js     (optional cloud)
-```
+1. Change your own component first before touching `state.js`
+2. Message the group before adding new fields to `state.js`
+3. Don't change `courses.js` without asking Parth — whole app uses it
+4. Keep the simple textarea editor on `parth` — don't bring back block editor
 
 ---
 
-## Rules when editing
+## Who to ask
 
-1. **Own your component first** — change your file before changing `state.js`.
-2. **`state.js` is shared** — tell the team in chat before adding new fields or renaming exports.
-3. **`courses.js` is Parth’s** — ask before changing course names (whole app uses the list).
-4. **`shared.js` is safe** — small helpers only; no business logic.
-5. **Do not revive** `blockEditor.js` / `codefusion.js` on `parth` — keep the simple textarea editor.
-
----
-
-## Quick “who do I ask?”
-
-| If you change… | Ask… |
-|----------------|------|
-| Note editor, page types (+ Todo / + Note / + Journal) | **Parth** |
-| Course list | **Parth** |
-| Flashcards / exam card generation | **Parth** + **Sahil** |
-| Kanban / study planner | **Kelvin** |
-| Today dashboard / profile / sign-in | **Dhruv** |
-| Analytics charts | **Sahil** |
-| AI screen (Epic 4) | **Whole team** |
-| Sidebar, main wiring, CSS theme | **Whoever is online** — avoid silent big changes |
+| Changing… | Ask |
+|-----------|-----|
+| Editor, + Note / + Todo / + Journal | Parth |
+| Course list | Parth |
+| Flashcards or exam card parsing | Parth + Sahil |
+| Kanban or planner | Kelvin |
+| Dashboard, profile, sign-in | Dhruv |
+| Analytics charts | Sahil |
+| AI screen | Team |
+| Sidebar, main.js, big CSS changes | Whoever's online |
 
 ---
 
-[← Main README](../README.md) · [For professor](./FOR_PROFESSOR.md) · [Progress tracker](./project_progress_tracker.md)
+[← Main README](../README.md) · [For professor](./FOR_PROFESSOR.md) · [Progress](./project_progress_tracker.md)

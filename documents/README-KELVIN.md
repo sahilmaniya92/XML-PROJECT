@@ -1,39 +1,41 @@
-# Kelvin Idoko — Assignments & Planner
+# Kelvin — Assignments & Planner
 
 | | |
 |---|---|
-| **Student ID** | N01777723 |
-| **Epics** | 5 (Assignments), 6 (Study Planner) |
+| **ID** | N01777723 |
+| **Epics** | 5 (Kanban), 6 (study planner) |
 
 ---
 
-## Your #1 user story (demo this)
+## My demo (Epic 5)
 
-### Epic 5 — Track progress on a Kanban board
+User story: *track assignments on a Kanban board.*
 
-> *"As a student, I update task completion using a Kanban board (To do → In progress → Done)."*
-
-**30-second demo**
+Steps (~30 sec):
 
 1. Sidebar → **Assignments**
-2. Show 3 columns with cards already loaded
-3. Click **In progress** on a "To do" card → card moves column
-4. Click **Mark done** → card moves to Done (strikethrough)
-5. Add new assignment using the form at top (title + date) → appears in **To do**
+2. Three columns already have cards from demo data
+3. Click **In progress** on a To do card — it moves
+4. Click **Mark done** — goes to Done column
+5. Add a new one at the top (title + date) — shows up in To do
 
-**Files you own:** `components/assignments.js`, assignment state in `utils/state.js`
-
----
-
-## Backup story (Epic 6)
-
-**Study planner** → Sidebar → Study planner → **Generate week**
+**My files:** `components/assignments.js`, assignment functions in `utils/state.js`
 
 ---
 
-## Shared — Epic 4 AI (whole team)
+## Backup (Epic 6 — partial)
 
-**AI assistant** → Sidebar → **AI** — placeholder UI done; backend + Gemini integration is **shared across the team**.
+Sidebar → **Study planner** → **Generate week**.
+
+Makes a simple weekly grid from your assignments and courses. Can't edit sessions yet — that's later.
+
+**Also mine:** `components/studyPlanner.js`, `utils/planner.js`
+
+---
+
+## Epic 4 (AI)
+
+Team builds this together. I'd help with loading states and error messages on the chat UI.
 
 ---
 

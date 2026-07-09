@@ -1,185 +1,132 @@
-# User Stories — Student Workspace
+# User stories
 
-Simple list of what we are building.  
-9 epics · 4 teammates · courses: xml/Js, sqlServer, OracleServer, pl/sql, DSA, data analitics
+Our 9 epics for Student Workspace.  
+Team: Dhruv, Parth, Kelvin, Sahil · Humber · summer 2026
+
+Courses in the app: xml/Js, sqlServer, OracleServer, pl/sql, DSA, data analitics
 
 ---
 
-## Epic 1 — Account & profile
+## Epic 1 — Profile & sign-in
 
-**As a student, I want to set up my profile and sign in so my work saves to the cloud.**
+**As a student, I want to set up my profile and sign in so my work saves.**
 
-| | |
-|---|---|
-| **Owner** | Dhruv Patel (N10015893) |
-| **Where** | Sidebar → Profile |
-| **Status** | 🟡 Partial |
+- **Owner:** Dhruv (N10015893)
+- **Where:** Profile
+- **Status:** Partial
 
-**Acceptance (for now)**
-- Fill name, university, semester, courses
-- Sign in with email or Google
-- Paste syllabus text → dates go to calendar
-- Data syncs to Supabase when signed in
+What works now: name, university, semester, course checkboxes, Google/email sign-in, paste syllabus → calendar dates, Supabase sync when signed in.
 
 ---
 
 ## Epic 2 — Today's dashboard
 
-**As a student, I want a dashboard that shows only what matters today so I know what to focus on.**
+**As a student, I want to see only what matters today.**
 
-| | |
-|---|---|
-| **Owner** | Dhruv Patel (N10015893) |
-| **Where** | Sidebar → Today |
-| **Status** | ✅ Done |
+- **Owner:** Dhruv (N10015893)
+- **Where:** Today
+- **Status:** Done
 
-**Acceptance (for now)**
-- See today's classes and events
-- See assignments due today
-- See quick stats (cards to review, tasks done, study time)
+What works now: today's classes/events, assignments due today, stat cards, progress bars.
 
 ---
 
-## Epic 3 — Notes linked to course & lecture
+## Epic 3 — Notes linked to course
 
-**As a student, I want every note linked to a course and lecture so I don't manually organize files.**
+**As a student, I want notes linked to course and lecture without manual tagging.**
 
-| | |
-|---|---|
-| **Owner** | Parth Patel (N01779255) |
-| **Where** | Sidebar → click any note |
-| **Status** | ✅ Done |
+- **Owner:** Parth (N01779255)
+- **Where:** + Note in sidebar
+- **Status:** Done
 
-**Acceptance (for now)**
-- Pick course from dropdown
-- Add lecture name (e.g. Week 3 — XML & DOM)
-- Edit note content like a simple doc
-- Sidebar shows course badge on each note
+What works now: course dropdown, lecture field, textarea editor, saves to localStorage. Also + Todo and + Journal page types.
 
 ---
 
 ## Epic 4 — AI assistant
 
-**As a student, I want to ask questions about my notes and get answers grounded in my lecture materials.**
+**As a student, I want to ask questions about my notes.**
 
-| | |
-|---|---|
-| **Owner** | Whole team (Dhruv, Parth, Sahil, Kelvin) |
-| **Where** | Sidebar → AI |
-| **Status** | ⬜ Placeholder (UI only) |
+- **Owner:** Whole team
+- **Where:** AI
+- **Status:** Placeholder (UI only)
 
-**Acceptance (planned)**
-- Ask a question in chat
-- Answer uses your uploaded notes (not generic web answers)
-- Gemini API + note search (team builds together)
+Plan for August: Gemini API, search your notes, show answers in chat. Not started yet.
 
 ---
 
 ## Epic 5 — Assignment Kanban
 
-**As a student, I want to track assignments on a Kanban board so I can see progress at a glance.**
+**As a student, I want a Kanban board for assignments.**
 
-| | |
-|---|---|
-| **Owner** | Kelvin Idoko (N01777723) |
-| **Where** | Sidebar → Assignments |
-| **Status** | ✅ Done |
+- **Owner:** Kelvin (N01777723)
+- **Where:** Assignments
+- **Status:** Done
 
-**Acceptance (for now)**
-- Three columns: To do, In progress, Done
-- Move cards with buttons on each assignment
-- Add new assignment with title, course, due date
+What works now: To do / In progress / Done columns, move cards, add new assignment.
 
 ---
 
 ## Epic 6 — Study planner
 
-**As a student, I want a weekly study plan generated from my courses and deadlines.**
+**As a student, I want a weekly study plan from my deadlines.**
 
-| | |
-|---|---|
-| **Owner** | Kelvin Idoko (N01777723) |
-| **Where** | Sidebar → Study planner |
-| **Status** | 🟡 Partial |
+- **Owner:** Kelvin (N01777723)
+- **Where:** Study planner
+- **Status:** Partial
 
-**Acceptance (for now)**
-- Click "Generate week"
-- See study blocks spread across the week
-- Based on assignments and enrolled courses
+What works now: Generate week button, simple grid. Can't edit individual blocks yet.
 
 ---
 
 ## Epic 7 — Flashcards
 
-**As a student, I want flashcards generated from my notes so I can review before exams.**
+**As a student, I want flashcards from my notes.**
 
-| | |
-|---|---|
-| **Owner** | Parth Patel (N01779255) |
-| **Where** | Sidebar → Flashcards |
-| **Status** | 🟡 Partial |
+- **Owner:** Parth (N01779255)
+- **Where:** Flashcards
+- **Status:** Partial
 
-**Acceptance (for now)**
-- Generate cards from note headings and bullets
-- Review due cards (Again / Good / Easy)
-- Filter by course
+What works now: generate from `##` and `•` in notes, review with Again/Good/Easy. Duplicate bug if you generate multiple times.
 
 ---
 
 ## Epic 8 — Exam prep
 
-**As a student, I want one-click exam mode to summarize my note and prep flashcards.**
+**As a student, I want exam mode to prep from my open note.**
 
-| | |
-|---|---|
-| **Owner** | Sahil Maniya (N01769967) |
-| **Where** | Sidebar → Exam prep |
-| **Status** | 🟡 Partial |
+- **Owner:** Sahil (N01769967)
+- **Where:** Exam prep
+- **Status:** Partial
 
-**Acceptance (for now)**
-- Open a lecture note first
-- See summary and flashcard preview
-- Activate exam mode → creates flashcards from that note
+What works now: summary + flashcard preview, activate creates cards from open note.
 
 ---
 
 ## Epic 9 — Analytics
 
-**As a student, I want to see how much I studied so I can track my habits.**
+**As a student, I want to see how much I studied.**
 
-| | |
-|---|---|
-| **Owner** | Sahil Maniya (N01769967) |
-| **Where** | Sidebar → Analytics |
-| **Status** | 🟡 Partial |
+- **Owner:** Sahil (N01769967)
+- **Where:** Analytics
+- **Status:** Partial
 
-**Acceptance (for now)**
-- Bar chart of study minutes (last 7 days)
-- Assignment completion count
-- Log study time manually
+What works now: 7-day bar chart, assignment count, log study time button.
 
 ---
 
-## Quick demo (one per person)
+## Demo quick ref
 
-| Person | Story | Click |
-|--------|-------|-------|
-| Dhruv | Today's schedule | **Today** |
-| Parth | Notes + course link | **xml/Js — XML & JavaScript lecture** |
-| Kelvin | Kanban board | **Assignments** |
-| Sahil | Exam prep | **Exam prep** → Activate |
-| All | AI (shell) | **AI** |
-
----
-
-## Status key
-
-| Symbol | Meaning |
-|--------|---------|
-| ✅ | Demo-ready |
-| 🟡 | Works but basic |
-| ⬜ | Placeholder / not wired yet |
+| Person | Click |
+|--------|-------|
+| Dhruv | Today |
+| Parth | + Note |
+| Kelvin | Assignments |
+| Sahil | Exam prep |
+| All | AI (shell) |
 
 ---
 
-[Progress tracker](./project_progress_tracker.md) · [MoSCoW timeline](./mosco_timeline.md) · [Main README](../README.md)
+Status: ✅ done for demo · 🟡 partial · ⬜ not built
+
+[Progress tracker](./project_progress_tracker.md) · [Timeline](./mosco_timeline.md) · [Main README](../README.md)
