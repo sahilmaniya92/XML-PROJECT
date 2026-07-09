@@ -61,15 +61,6 @@ We kept the editor as a textarea so we can actually explain it in class. The AI 
 
 ---
 
-## Example: Parth explaining `editor.js`
-
-1. We build HTML as a string and drop it in with `container.innerHTML`
-2. Courses come from `utils/courses.js` — our real semester list
-3. On `input` / `change` we call `onUpdatePage()` → saves to `state.js` → `localStorage`
-4. Flashcards read the same text (`##` and `•`) — no separate database
-
----
-
 ## Why the repo looks bigger than it is
 
 - Old CSS and unused utils are still in the repo from earlier experiments
