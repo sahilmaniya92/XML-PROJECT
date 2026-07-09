@@ -1,40 +1,39 @@
-# Sahil Maniya — Exam & Analytics
+# Sahil — Exam Prep & Analytics
 
 | | |
 |---|---|
-| **Student ID** | N01769967 |
-| **Epics** | 8 (Exam), 9 (Analytics) |
+| **ID** | N01769967 |
+| **Epics** | 8 (exam), 9 (analytics) |
 
 ---
 
-## Your #1 user story (demo this)
+## My demo (Epic 8)
 
-### Epic 8 — One-click exam prep
+User story: *one-click exam mode from my open note.*
 
-> *"As a student, I activate exam mode to get a summary and flashcards from my open note."*
+Steps (~30 sec):
 
-**30-second demo**
-
-1. Sidebar → open **xml/Js — XML & JavaScript lecture**
+1. Open a note first — sidebar → **+ Note**, add some `##` headings and `•` bullets
 2. Sidebar → **Exam prep**
-3. Click **Activate exam mode** → flashcards created from note headings
-4. Go to **Flashcards** → review due cards
-5. **Analytics** → see study hours chart
+3. Click **Activate exam mode** — pulls headings from the note
+4. Optional: **Flashcards** → review what got generated
+5. **Analytics** — bar chart of study minutes (basic)
 
-**Files you own:** `components/examMode.js`, `components/analytics.js`
+**My files:** `components/examMode.js`, `components/analytics.js`
 
 ---
 
-## Shared — Epic 4 AI (whole team)
+## Epic 9 (partial)
 
-| | |
-|---|---|
-| **Epic** | 4 (AI) |
-| **Status** | UI shell done — chat/API wired by **all teammates** |
+Analytics screen works but it's simple — last 7 days bar chart, assignment count, manual study log.
 
-**Show in demo:** Sidebar → **AI** → explain coming soon screen and team plan for Gemini + note search.
+---
 
-**Files:** `components/ai.js`, `main.js`, `utils/state.js`
+## Epic 4 (AI)
+
+Team epic. I'd probably wire the Gemini API when we get to it in August.
+
+For now: Sidebar → **AI** → show the coming soon screen and explain the plan.
 
 ---
 

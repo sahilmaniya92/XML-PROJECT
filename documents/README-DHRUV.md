@@ -1,41 +1,40 @@
-# Dhruv Patel — Platform & Dashboard
+# Dhruv — Dashboard & Profile
 
 | | |
 |---|---|
-| **Student ID** | N10015893 |
-| **Epics** | 1 (Account), 2 (Dashboard) |
+| **ID** | N10015893 |
+| **Epics** | 1 (profile), 2 (dashboard) |
 
 ---
 
-## Your #1 user story (demo this)
+## My demo (Epic 2)
 
-### Epic 2 — View today's schedule
+User story: *dashboard shows only what's relevant today.*
 
-> *"As a student, the dashboard shows only what's relevant to today."*
+Steps (~30 sec):
 
-**30-second demo**
+1. Open app — you're on **Today** already
+2. **Today's schedule** — classes and events for today
+3. Stat cards — due today, cards to review, tasks done, study time
+4. **Progress** panel — assignment bars
 
-1. Open app → **Today** (default screen)
-2. Show **Today's schedule** panel:
-   - **10:00 AM** — xml/Js lecture — XML & DOM
-   - **3:00 PM** — Study group — XML project
-   - **Due** — XML Project professor demo
-3. Show stat cards: Due today, Cards to review, Tasks done, Study time
-4. Show **Progress** panel with assignment bars
-
-**Files you own:** `components/dashboard.js`, `utils/state.js` (dashboard data), `main.js` (routing)
+**My files:** `components/dashboard.js`, helped with `utils/state.js` and routing in `main.js`
 
 ---
 
-## Backup story (Epic 1)
+## Backup (Epic 1 — partial)
 
-**Profile + syllabus** → Sidebar → **Profile** → fill university → paste syllabus → **Parse dates**
+Sidebar → **Profile** → fill name / university / semester → paste syllabus → parse dates into calendar.
+
+Sign-in with Google or email → syncs to Supabase if it works. Still rough.
+
+**Also mine:** `components/profile.js`, `components/auth.js`
 
 ---
 
-## Shared — Epic 4 AI (whole team)
+## Epic 4 (AI)
 
-**AI assistant** → Sidebar → **AI** (UI shell done; Gemini + note search — team builds together)
+Whole team. I'd probably handle auth + Supabase side when we wire Gemini in August.
 
 ---
 

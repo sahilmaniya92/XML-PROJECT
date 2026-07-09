@@ -1,147 +1,103 @@
-# MoSCoW Timeline — Student Workspace
+# Timeline (MoSCoW)
 
-**Project window:** June 2026 → August 2026  
-**Team:** Dhruv · Parth · Sahil · Kelvin  
-**Today:** July 7, 2026 — we are in **month 2 of 3**
+**Student Workspace** — June to August 2026  
+**Team:** Dhruv · Parth · Kelvin · Sahil
+
+We're in July now — month 2 of 3.
 
 ---
 
-## Overall timeline
+## Big picture
 
 ```
-June 2026          July 2026           August 2026
-|-----------|-------------------|-------------------|
-  START      MVP build (now)      polish + finish
-  setup      9 epics / demos      AI + professor demo
+June          July              August
+setup    →    build screens  →  AI + professor demo
 ```
 
-| Month | Phase | Focus |
-|-------|-------|-------|
-| **June 2026** | Start & setup | Vite, Tailwind, repo, first UI, Supabase keys |
-| **July 2026** | Build MVP | All 9 epic screens, demo data, team READMEs |
-| **August 2026** | Finish & demo | Epic 4 AI, bug fixes, professor presentation |
+| Month | What we're doing |
+|-------|------------------|
+| June | Repo, Vite, first sidebar + editor, split tasks |
+| July | All 9 screens, demo data, docs, bug fixes |
+| August | AI hookup, polish, presentation |
 
 ---
 
-## June 2026 — Started last month
+## June (done)
 
-**Goal:** Get the project running and split the work.
+Got the project running and divided epics.
 
-| Week | What we did |
-|------|-------------|
-| Week 1 | Git repo, Vite + Tailwind setup, first sidebar + editor |
-| Week 2 | Block editor, localStorage, page CRUD |
-| Week 3 | Supabase auth + sync started |
-| Week 4 | Home dashboard, calendar, team division in README |
+- Week 1: Git repo, Vite + Tailwind, sidebar
+- Week 2: Editor, localStorage, create/delete pages
+- Week 3: Supabase auth started
+- Week 4: Dashboard idea, calendar, README per person
 
-**MoSCoW (June)**
-
-| Priority | Item | Status |
-|----------|------|--------|
-| **Must** | App runs locally (`npm run dev`) | ✅ |
-| **Must** | Notes editor + sidebar | ✅ |
-| **Must** | Team task split (4 people) | ✅ |
-| **Should** | Supabase sign-in | ✅ |
-| **Could** | Calendar events | ✅ |
-| **Won't (yet)** | Gemini AI chat | ⬜ August |
+Must-haves done: app runs, notes work, team split agreed.
 
 ---
 
-## July 2026 — Current month (building MVP)
+## July (now)
 
-**Goal:** Map all 9 epics to working screens. One demo-ready story per person.
+Goal: every epic has a screen. One solid demo per person.
 
-| Week | What we are doing |
-|------|-------------------|
-| Week 1 (Jul 1–7) | Rebrand to Student Workspace, dashboard, assignments Kanban |
-| Week 2 (Jul 8–14) | Notes + course link, flashcards, exam prep, analytics |
-| Week 3 (Jul 15–21) | Study planner, profile, demo seed data, docs |
-| Week 4 (Jul 22–31) | Bug fixes, progress tracker, user stories, team polish |
+- Week 1: Rebrand to Student Workspace, dashboard, Kanban
+- Week 2: Notes + course link, flashcards, exam prep, analytics
+- Week 3: Study planner, profile, moved docs to `documents/` folder
+- Week 4: Fix bugs, update tracker, rehearse demos
 
-**MoSCoW (July)**
+| Epic | Owner | July status |
+|------|-------|-------------|
+| 2 Today | Dhruv | Done |
+| 3 Notes | Parth | Done |
+| 5 Kanban | Kelvin | Done |
+| 8 Exam | Sahil | Partial |
+| 1 Profile | Dhruv | Partial |
+| 7 Flashcards | Parth | Partial |
+| 6 Planner | Kelvin | Partial |
+| 9 Analytics | Sahil | Partial |
+| 4 AI | Team | UI shell only |
 
-| Priority | Epic | Owner | Status |
-|----------|------|-------|--------|
-| **Must** | Epic 2 — Today dashboard | Dhruv | ✅ |
-| **Must** | Epic 3 — Notes + course/lecture | Parth | ✅ |
-| **Must** | Epic 5 — Assignment Kanban | Kelvin | ✅ |
-| **Must** | Epic 8 — Exam prep | Sahil | 🟡 |
-| **Should** | Epic 1 — Profile + sign-in | Dhruv | 🟡 |
-| **Should** | Epic 7 — Flashcards | Parth | 🟡 |
-| **Should** | Epic 6 — Study planner | Kelvin | 🟡 |
-| **Should** | Epic 9 — Analytics | Sahil | 🟡 |
-| **Could** | Epic 4 — AI UI shell | Whole team | ⬜ |
-| **Won't (July)** | Full Gemini RAG | — | August |
+Full Gemini AI → pushed to August on purpose.
 
 ---
 
-## August 2026 — Finish through next month
+## August (plan)
 
-**Goal:** Complete remaining work and present to professor.
+- Week 1: Wire Epic 4 — Gemini + note search (team)
+- Week 2: Flashcard duplicate fix, planner polish
+- Week 3: Test everything, Supabase demo ready
+- Week 4: Professor presentation + submit
 
-| Week | Plan |
-|------|------|
-| Week 1 (Aug 1–7) | Wire Epic 4 AI (Gemini + note search) — whole team |
-| Week 2 (Aug 8–14) | Fix flashcard duplicates, planner polish, UI cleanup |
-| Week 3 (Aug 15–21) | End-to-end testing, Supabase demo, rehearse presentations |
-| Week 4 (Aug 22–31) | Final professor demo, documentation, submit project |
+Must finish: AI basic Q&A, all 4 person demos rehearsed, Supabase stable.
 
-**MoSCoW (August)**
-
-| Priority | Item | Owner |
-|----------|------|-------|
-| **Must** | Epic 4 AI working (basic Q&A from notes) | Whole team |
-| **Must** | All 4 person demos rehearsed | All |
-| **Must** | Supabase sync stable for demo | Dhruv |
-| **Should** | Flashcard duplicate fix | Parth |
-| **Should** | Study planner edit sessions | Kelvin |
-| **Could** | Remove CodeFusion legacy panel | Any |
-| **Won't** | Real-time collaboration | Out of scope |
+Won't do: real-time collab, mobile app — out of scope.
 
 ---
 
-## Epic delivery map (3 months)
+## Epic timeline
 
-| Epic | Story | June | July | August |
-|------|-------|:----:|:----:|:------:|
-| 1 | Profile + sign-in | 🟡 | 🟡 | ✅ target |
-| 2 | Today's dashboard | — | ✅ | ✅ |
-| 3 | Notes + course link | 🟡 | ✅ | ✅ |
-| 4 | AI assistant | — | ⬜ shell | ✅ target |
-| 5 | Kanban assignments | — | ✅ | ✅ |
-| 6 | Study planner | — | 🟡 | ✅ target |
-| 7 | Flashcards | — | 🟡 | ✅ target |
-| 8 | Exam prep | — | 🟡 | ✅ target |
-| 9 | Analytics | — | 🟡 | ✅ target |
-
----
-
-## Milestones
-
-| Date | Milestone |
-|------|-----------|
-| **Jun 2026** | Project started — repo + dev environment |
-| **Early Jul 2026** | Student Workspace rebrand + epic screens |
-| **Jul 7, 2026** | User stories + progress tracker documented |
-| **End Jul 2026** | All screens demo-able (target) |
-| **Mid Aug 2026** | Epic 4 AI wired (target) |
-| **End Aug 2026** | Professor demo + project submit (target) |
+| Epic | June | July | August target |
+|------|:----:|:----:|:-------------:|
+| 1 Profile | started | partial | finish |
+| 2 Dashboard | — | done | done |
+| 3 Notes | started | done | done |
+| 4 AI | — | shell | build |
+| 5 Kanban | — | done | done |
+| 6 Planner | — | partial | finish |
+| 7 Flashcards | — | partial | finish |
+| 8 Exam | — | partial | finish |
+| 9 Analytics | — | partial | finish |
 
 ---
 
-## Team — who works when
+## Who's doing what when
 
 | Person | June | July | August |
 |--------|------|------|--------|
-| **Dhruv** | Setup, state, Supabase | Dashboard, profile | Auth polish, sync for demo |
-| **Parth** | Editor, styles | Notes, flashcards, courses | Flashcard fixes, note context for AI |
-| **Sahil** | UI components | Exam prep, analytics | Gemini API, AI prompts |
-| **Kelvin** | Vite / build | Assignments, planner | Kanban polish, AI UI states |
+| Dhruv | state, Supabase | dashboard, profile | auth polish, sync |
+| Parth | editor, CSS | notes, flashcards, courses | flashcard fix, AI note context |
+| Sahil | components | exam, analytics | Gemini API |
+| Kelvin | build setup | assignments, planner | Kanban + AI UI |
 
 ---
 
-## Links
-
-- [User stories](./user_stories.md)
-- [Progress tracker](./project_progress_tracker.md)
-- [Main README](../README.md)
+[User stories](./user_stories.md) · [Progress](./project_progress_tracker.md) · [Main README](../README.md)

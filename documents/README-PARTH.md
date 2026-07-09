@@ -1,64 +1,53 @@
-# Parth Patel — Notes & Flashcards
+# Parth — Notes & Flashcards
 
 | | |
 |---|---|
-| **Student ID** | N01779255 |
-| **Epics** | 3 (Notes), 7 (Flashcards) |
-| **Branch** | `parth` — simplified on purpose (textarea, no block editor) |
+| **ID** | N01779255 |
+| **Epics** | 3 (notes), 7 (flashcards) |
 
 ---
 
-## If professor asks "is this all AI?"
+## My demo (Epic 3)
 
-Say this:
+User story: *every note links to a course and lecture so I don't have to tag files myself.*
 
-1. **My part is `editor.js`** — about 100 lines, plain textarea + course dropdown.
-2. We **removed** the Notion-style block editor so the code is explainable.
-3. Epic 3 = when you pick a course, it saves on the page object in `state.js`.
-4. Flashcards (Epic 7) only **reads** `##` and `•` from that same text — partial, not finished.
+Steps (~30 sec):
 
-Full team honesty doc: [FOR_PROFESSOR.md](./FOR_PROFESSOR.md)  
-File map (who owns what): [FILES.md](./FILES.md)
-
----
-
-## Your #1 user story (demo this)
-
-### Epic 3 — Organize notes: auto-link to course and lecture
-
-> *"As a student, every note is auto-linked to its course and lecture so I don't manually tag files."*
-
-**30-second demo**
-
-1. Sidebar → click **+ Note** to create a lecture note
+1. Sidebar → **+ Note**
 2. Pick **Course** (xml/Js) and type **Lecture** (e.g. Week 3 — XML)
-3. Point at the orange bar: **Linked to xml/Js · Week 3…**
-4. Type in the **text area** under `## Key concepts`
-5. Sidebar shows the note under **Notes** with course badge
+3. Orange bar shows: Linked to xml/Js · Week 3…
+4. Type under `## Key concepts` in the textarea
+5. Note shows in sidebar under **Notes** with the course name
 
-**Also try:** **+ Todo** for `☐` tasks · **+ Journal** for free writing (no course)
+Also built: **+ Todo** (checkbox lines with ☐) and **+ Journal** (free writing, no course).
 
-**Files you own:** `components/editor.js`, `utils/courses.js`
-
----
-
-## Backup story (Epic 7)
-
-**Generate flashcards from notes** → Sidebar → Flashcards → **Generate from open note** → **Review due**
+**My files:** `components/editor.js`, `utils/courses.js`
 
 ---
 
-## Technical notes (simple on purpose)
+## Backup demo (Epic 7 — not fully done)
 
-- Notes are **plain text** in a `<textarea>` — easy to read and explain to professor
-- Use `##` for headings and `•` for bullets (flashcards read this)
-- `course` + `lecture` saved on each page in `state.js`
+Sidebar → **Flashcards** → generate from open note → review due cards.
+
+Reads `##` for question and `•` for answer from the same note text. Still has bugs (duplicates if you generate too many times).
+
+**Also mine:** `components/flashcards.js`, `utils/flashcards.js`
 
 ---
 
-## Shared — Epic 4 AI (whole team)
+## How it works (short)
 
-**AI assistant** → Sidebar → **AI** — UI shell only for now
+- Plain `<textarea>` — we removed the Notion-style block editor so the code is ~130 lines
+- `course` and `lecture` live on each page object in `state.js`
+- Saves on every keystroke through `onUpdatePage()`
+
+---
+
+## Epic 4 (AI)
+
+Team thing. I might help with note context for prompts later. Screen is in `ai.js` — not connected yet.
+
+Team notes: [FOR_PROFESSOR.md](./FOR_PROFESSOR.md) · [FILES.md](./FILES.md)
 
 ---
 
