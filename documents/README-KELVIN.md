@@ -107,6 +107,8 @@ The Study Planner interface and functionality have been implemented. Further imp
 - Vite development environment
 - HTML/CSS
 - Browser developer tools
+- Cursor AI Agent for code assistance, debugging, and improving implementation workflow
+- ChatGPT for code explanations, troubleshooting, documentation support, and development guidance
 
 ### Project Resources
 - Existing application state management (`utils/state.js`)
