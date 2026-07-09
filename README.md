@@ -1,62 +1,73 @@
-# Student Workspace — 4-Week MVP
+# Student Workspace
 
-Simple academic app: notes, today's dashboard, assignments, flashcards, calendar.  
-Data saves in **browser localStorage**. Sign in to sync one JSON row to **Supabase**.
+Group project for XML & JavaScript — Humber College, summer 2026.
 
-## How it works (simple)
+We built a small academic app: notes, a today dashboard, assignments, flashcards, calendar. Data saves in the browser (`localStorage`). You can sign in with Supabase to sync one JSON row to the cloud.
 
-1. **Open app** → you land on **Today** (dashboard).
-2. **Sidebar** → pick a screen (Assignments, Flashcards, etc.) or click a **note** to edit.
-3. **Notes** → type like a doc. Pick **Course** + **Lecture** so notes stay organized.
-4. **Assignments** → Kanban board: To do → In progress → Done.
-5. **Sign in** (optional) → same data copies to Supabase `workspaces` table.
+**Where we're at:** 4 features work well enough to demo (one each). A few more screens exist but aren't finished. AI is just a placeholder page for now.
 
-**AI (Epic 4)** → sidebar screen exists; full chat is a **whole-team** task (Gemini later).
+More detail for the professor: [FOR_PROFESSOR.md](./documents/FOR_PROFESSOR.md)
 
-## Epic coverage
+## What's actually done vs not
 
-| Epic | Feature | Sidebar | Owner |
-|------|---------|---------|-------|
-| 1 | Profile, Google sign-in, syllabus parse | Profile | Dhruv |
-| 2 | Today's dashboard, progress | **Today** | Dhruv |
-| 3 | Rich notes + course/lecture link | Notes list | Parth |
-| 4 | AI assistant (UI shell) | **AI** | **Whole team** |
-| 5 | Assignment Kanban | **Assignments** | Kelvin |
-| 6 | Weekly study plan generator | **Study planner** | Kelvin |
-| 7 | Flashcards + spaced repetition | **Flashcards** | Parth |
-| 8 | One-click exam prep | **Exam prep** | Sahil |
-| 9 | Study hours chart | **Analytics** | Sahil |
+| | What |
+|---|------|
+| Works for demo | Today dashboard (Dhruv), notes + course link (Parth), Kanban (Kelvin), exam prep (Sahil) |
+| Started but rough | Profile, study planner, flashcards, analytics |
+| Not built yet | AI chat (whole team — screen only) |
 
-## Team READMEs
+We have 9 sidebar links because our story map has 9 epics. That doesn't mean all 9 are done.
 
-| Person | File |
-|--------|------|
-| Dhruv Patel | [README-DHRUV.md](./README-DHRUV.md) |
-| Sahil Maniya | [README-SAHIL.md](./README-SAHIL.md) |
-| Parth Patel | [README-PARTH.md](./README-PARTH.md) |
-| Kelvin Idoko | [README-KELVIN.md](./README-KELVIN.md) |
+## How to use the app
 
-**Progress tracker:** [project_progress_tracker.md](./project_progress_tracker.md)  
-**User stories:** [user_stories.md](./user_stories.md)  
-**Timeline:** [mosco_timeline.md](./mosco_timeline.md) (June → August 2026)
+1. Open app → lands on **Today**
+2. Sidebar → pick a screen or click a page under Notes / Todo / Journal
+3. **+ Note** → pick course + lecture, type in the textarea
+4. **Assignments** → drag cards between To do / In progress / Done
+5. Sign in (optional) → data copies to Supabase
 
-## One demo per person
+## Who owns what
 
-| Person | User story | Click here |
-|--------|------------|------------|
-| **Dhruv** | View today's schedule | **Today** |
-| **Parth** | Notes linked to course + lecture | **xml/Js — XML & JavaScript lecture** |
-| **Sahil** | Exam prep from open note | **Exam prep** → activate |
-| **Kelvin** | Kanban assignment tracking | **Assignments** → move cards |
-| **All** | AI section (shell) | **AI** → coming soon |
+| Epic | Feature | Sidebar | Person |
+|------|---------|---------|--------|
+| 1 | Profile, sign-in, syllabus | Profile | Dhruv |
+| 2 | Today's dashboard | Today | Dhruv |
+| 3 | Notes + course/lecture | + Note | Parth |
+| 4 | AI assistant | AI | Whole team |
+| 5 | Assignment Kanban | Assignments | Kelvin |
+| 6 | Study planner | Study planner | Kelvin |
+| 7 | Flashcards | Flashcards | Parth |
+| 8 | Exam prep | Exam prep | Sahil |
+| 9 | Analytics | Analytics | Sahil |
 
-> First open loads demo data (lecture note, today's events, assignments).
+## Team docs
 
-## Run
+| Person | Guide |
+|--------|-------|
+| Dhruv Patel | [README-DHRUV.md](./documents/README-DHRUV.md) |
+| Parth Patel | [README-PARTH.md](./documents/README-PARTH.md) |
+| Kelvin Idoko | [README-KELVIN.md](./documents/README-KELVIN.md) |
+| Sahil Maniya | [README-SAHIL.md](./documents/README-SAHIL.md) |
+
+Also: [progress tracker](./documents/project_progress_tracker.md) · [user stories](./documents/user_stories.md) · [timeline](./documents/mosco_timeline.md) · [file map](./documents/FILES.md)
+
+## Demo cheat sheet (one per person)
+
+| Person | Click this | Show this |
+|--------|------------|-----------|
+| Dhruv | **Today** | Today's events, due stuff, stats |
+| Parth | **+ Note** | Course dropdown, lecture field, textarea saves |
+| Kelvin | **Assignments** | Move a card across columns |
+| Sahil | **Exam prep** | Activate on an open note |
+| Everyone | **AI** | Coming soon screen — not wired yet |
+
+First open loads some demo assignments and calendar events. No default notes — you create your own with + Note.
+
+## Run locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173)
+Then open http://localhost:5173

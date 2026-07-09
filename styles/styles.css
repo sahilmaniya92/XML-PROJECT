@@ -2,17 +2,17 @@
 
 @theme {
   --font-sans: 'Inter', ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  --color-sidebar: #fbfbfa;
-  --color-sidebar-hover: #f1f0ee;
-  --color-sidebar-active: #e8e6e1;
-  --color-border: #e6e4df;
-  --color-text: #1c1917;
-  --color-muted: #78716c;
-  --color-accent: #1d4ed8;
-  --color-accent-soft: #eff6ff;
+  --color-sidebar: #faf9f7;
+  --color-sidebar-hover: #f3f1ed;
+  --color-sidebar-active: #fdeee3;
+  --color-border: #e8e4de;
+  --color-text: #1a2332;
+  --color-muted: #6b7280;
+  --color-accent: #e87722;
+  --color-accent-hover: #c96112;
+  --color-accent-soft: #fff4ec;
   --color-surface: #ffffff;
-  --color-codefusion: #6d28d9;
-  --color-codefusion-light: #ede9fe;
+  --color-page: #f7f6f3;
   --sidebar-width: 260px;
   --editor-width: 760px;
 }
@@ -29,7 +29,7 @@ body,
 
 body {
   color: var(--color-text);
-  background: #fff;
+  background: var(--color-page);
   overflow: hidden;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -408,12 +408,12 @@ body {
 }
 
 .topbar-btn-primary {
-  background: var(--color-text);
+  background: var(--color-accent);
   color: #fff;
 }
 
 .topbar-btn-primary:hover {
-  background: #2f2e2a;
+  background: var(--color-accent-hover);
 }
 
 .topbar-btn-ghost {
@@ -2485,7 +2485,7 @@ body {
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: var(--color-text);
+  background: var(--color-accent);
   color: #fff;
   font-size: 11px;
   font-weight: 700;
@@ -2507,6 +2507,25 @@ body {
   display: block;
   font-size: 11px;
   color: var(--color-muted);
+}
+
+.sw-mvp-tag {
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--color-muted);
+  margin: 0 8px 6px;
+  padding: 6px 8px;
+  background: var(--color-accent-soft);
+  border-radius: 6px;
+  border-left: 2px solid var(--color-accent);
+}
+
+.sw-team {
+  font-size: 10px;
+  color: var(--color-muted);
+  text-align: center;
+  margin: 0 0 6px;
+  padding: 0 4px;
 }
 
 .sw-search {
@@ -2560,7 +2579,12 @@ body {
 }
 
 .sw-nav-item:hover { background: var(--color-sidebar-hover); }
-.sw-nav-item.is-active { background: var(--color-sidebar-active); font-weight: 600; }
+.sw-nav-item.is-active {
+  background: var(--color-sidebar-active);
+  font-weight: 600;
+  color: var(--color-accent-hover);
+  box-shadow: inset 3px 0 0 var(--color-accent);
+}
 
 .sw-badge {
   margin-left: auto;
@@ -2634,6 +2658,70 @@ body {
 
 .sw-empty { font-size: 12px; color: var(--color-muted); padding: 8px; }
 
+.sw-pages { flex: 1; min-height: 0; overflow-y: auto; margin-top: 4px; }
+
+.sw-pages-head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 4px 8px;
+}
+
+.sw-add-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sw-add-btn {
+  flex: 1;
+  min-width: 0;
+  border: 1px dashed var(--color-border);
+  background: var(--color-surface);
+  border-radius: 6px;
+  padding: 5px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-accent);
+  cursor: pointer;
+}
+
+.sw-add-btn:hover {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
+}
+
+.sw-page-group { margin-bottom: 10px; }
+
+.sw-page-group-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted);
+  padding: 4px 8px 6px;
+  margin: 0;
+}
+
+.sw-empty-pages {
+  padding: 12px 8px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.editor-kind-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-accent);
+  margin: 0 0 12px;
+  padding: 4px 10px;
+  background: var(--color-accent-soft);
+  border-radius: 4px;
+}
+
 /* Workspace views */
 .ws-view {
   max-width: 960px;
@@ -2651,6 +2739,7 @@ body {
 .ws-eyebrow { font-size: 12px; font-weight: 500; color: var(--color-muted); margin: 0 0 4px; }
 .ws-title { font-size: 28px; font-weight: 700; letter-spacing: -0.03em; margin: 0; color: var(--color-text); }
 .ws-lead { font-size: 14px; color: var(--color-muted); margin: 6px 0 0; line-height: 1.5; }
+.ws-lead-sub { font-size: 13px; opacity: 0.9; }
 .ws-back { border: none; background: none; font-size: 13px; color: var(--color-muted); cursor: pointer; padding: 0; margin-bottom: 12px; }
 .ws-back:hover { color: var(--color-text); }
 
@@ -2664,11 +2753,18 @@ body {
 .ws-stat {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 16px;
+  box-shadow: 0 1px 2px rgba(26, 35, 50, 0.04);
 }
 
-.ws-stat-val { display: block; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+.ws-stat-val {
+  display: block;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-accent);
+}
 .ws-stat-lbl { display: block; font-size: 11px; color: var(--color-muted); margin-top: 2px; }
 
 .ws-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
@@ -2682,9 +2778,10 @@ body {
 .ws-panel {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 18px 20px;
   margin-bottom: 16px;
+  box-shadow: 0 1px 2px rgba(26, 35, 50, 0.04);
 }
 
 .ws-panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
@@ -2760,7 +2857,7 @@ body {
 
 .ws-btn:hover { background: var(--color-sidebar-hover); }
 .ws-btn-primary { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
-.ws-btn-primary:hover { background: #1e40af; }
+.ws-btn-primary:hover { background: var(--color-accent-hover); border-color: var(--color-accent-hover); }
 .ws-btn-ghost { background: transparent; }
 .ws-btn-sm { padding: 6px 12px; font-size: 12px; }
 .ws-btn-google { display: inline-flex; align-items: center; gap: 10px; width: 100%; justify-content: center; padding: 10px; }
@@ -2908,3 +3005,183 @@ body {
   border-radius: 12px;
 }
 .ws-ai-disabled { opacity: 0.55; pointer-events: none; }
+
+/* --- Simple student editor (parth branch) --- */
+.editor-simple {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+}
+
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.editor-toolbar-label {
+  font-size: 12px;
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.editor-select-sm {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.editor-fav-btn {
+  border: 1px solid var(--color-border);
+  background: #fff;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.editor-fav-btn:hover { background: var(--color-accent-soft); }
+
+.editor-title-input {
+  width: 100%;
+  border: none;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text);
+  outline: none;
+  margin-bottom: 16px;
+  padding: 4px 0;
+  background: transparent;
+}
+
+.editor-title-input::placeholder { color: #c4c4c0; }
+
+.editor-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.editor-meta label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+.editor-select,
+.editor-input {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  background: #fff;
+}
+
+.editor-textarea {
+  width: 100%;
+  min-height: 360px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  font-family: inherit;
+  resize: vertical;
+  background: #fff;
+}
+
+.editor-textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent-soft);
+}
+
+.editor-hint {
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-top: 8px;
+}
+
+.topbar-simple .topbar-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.topbar-simple .topbar-crumb-btn {
+  border: none;
+  background: none;
+  color: var(--color-muted);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+}
+
+.topbar-simple .topbar-crumb-btn:hover { color: var(--color-accent); }
+
+.topbar-simple .topbar-title {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.topbar-simple .topbar-btn-danger {
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+@media (max-width: 640px) {
+  .editor-meta { grid-template-columns: 1fr; }
+  .hidden-mobile { display: none; }
+}
+
+/* Humber College — calm, simple polish */
+.app-shell { background: var(--color-page); }
+
+.app-sidebar {
+  background: var(--color-sidebar);
+  border-right-color: var(--color-border);
+}
+
+.app-main {
+  background: var(--color-page);
+}
+
+.sw-badge {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.sw-note-item.is-active {
+  background: var(--color-sidebar-active);
+  box-shadow: inset 2px 0 0 var(--color-accent);
+}
+
+.ws-eyebrow {
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 11px;
+}
+
+.editor-textarea {
+  background: var(--color-surface);
+  border-radius: 10px;
+  box-shadow: inset 0 1px 2px rgba(26, 35, 50, 0.03);
+}
+
+.editor-title-input:focus,
+.editor-select:focus,
+.editor-input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent-soft);
+}

@@ -14,27 +14,33 @@ const NAV = [
   { id: 'calendar', label: 'Calendar', icon: navIcon('cal') },
 ]
 
+const PAGE_SECTIONS = [
+  { kind: 'todo', label: 'Todo lists' },
+  { kind: 'note', label: 'Notes' },
+  { kind: 'journal', label: 'Journal' },
+]
+
 export function renderSidebar(container, handlers) {
   const state = getState()
-  const { activePageId, searchQuery, activeView, user, privateSectionCollapsed } = state
+  const { activePageId, searchQuery, activeView } = state
   const pages = getFilteredPages()
-  const favorites = pages.filter((p) => p.favorite)
-  const otherPages = pages.filter((p) => !p.favorite)
   const dueCount = getDueFlashcards('All').length
 
   container.innerHTML = `
     <div class="sw-sidebar">
       <div class="sw-brand">
-        <span class="sw-brand-mark">SW</span>
+        <span class="sw-brand-mark">HC</span>
         <div class="sw-brand-text">
           <span class="sw-brand-name">Student Workspace</span>
-          <span class="sw-brand-sub">${user ? escape(user.email?.split('@')[0]) : 'Not signed in'}</span>
+          <span class="sw-brand-sub">MVP · XML/JS project</span>
         </div>
       </div>
 
+      <p class="sw-mvp-tag">4 demos ready · 5 screens partial · AI not built yet</p>
+
       <div class="sw-search">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/></svg>
-        <input type="search" class="sw-search-input" placeholder="Search notes…" value="${escape(searchQuery)}" />
+        <input type="search" class="sw-search-input" placeholder="Search pages…" value="${escape(searchQuery)}" />
       </div>
 
       <nav class="sw-nav">
@@ -51,27 +57,31 @@ export function renderSidebar(container, handlers) {
         }).join('')}
       </nav>
 
-      <div class="sw-notes">
-        <p class="sw-nav-label">Notes</p>
-        <div class="sw-notes-list">
-          ${[...favorites, ...otherPages]
-            .slice(0, searchQuery ? 20 : 12)
-            .map(pageRow(activePageId, activeView))
-            .join('') || '<p class="sw-empty">No notes</p>'}
+      <div class="sw-pages">
+        <div class="sw-pages-head">
+          <p class="sw-nav-label">Your pages</p>
+          <div class="sw-add-row">
+            <button type="button" class="sw-add-btn" data-action="new-todo" title="New todo list">+ Todo</button>
+            <button type="button" class="sw-add-btn" data-action="new-note" title="New note">+ Note</button>
+            <button type="button" class="sw-add-btn" data-action="new-journal" title="New journal">+ Journal</button>
+          </div>
         </div>
+
+        ${
+          pages.length
+            ? PAGE_SECTIONS.map((section) => pageSection(section, pages, activePageId, activeView)).join('')
+            : `<p class="sw-empty sw-empty-pages">No pages yet — use + Todo, + Note, or + Journal above.</p>`
+        }
       </div>
 
       <footer class="sw-footer">
+        <p class="sw-team">Dhruv · Parth · Kelvin · Sahil</p>
         <button type="button" class="sw-footer-btn" data-action="profile">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
           Profile
         </button>
-        <button type="button" class="sw-footer-btn" data-action="new-page">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-          New note
-        </button>
-        <button type="button" class="sw-footer-btn" data-action="auth">${user ? 'Account' : 'Sign in'}</button>
-        ${user ? '<button type="button" class="sw-footer-btn sw-footer-muted" data-action="sign-out">Sign out</button>' : ''}
+        <button type="button" class="sw-footer-btn" data-action="auth">${state.user ? 'Account' : 'Sign in'}</button>
+        ${state.user ? '<button type="button" class="sw-footer-btn sw-footer-muted" data-action="sign-out">Sign out</button>' : ''}
       </footer>
     </div>
   `
@@ -98,9 +108,23 @@ export function renderSidebar(container, handlers) {
   })
 
   container.querySelector('[data-action="profile"]')?.addEventListener('click', handlers.onOpenProfile)
-  container.querySelector('[data-action="new-page"]')?.addEventListener('click', () => handlers.onNewPage(false))
+  container.querySelector('[data-action="new-todo"]')?.addEventListener('click', () => handlers.onNewPage('todo'))
+  container.querySelector('[data-action="new-note"]')?.addEventListener('click', () => handlers.onNewPage('note'))
+  container.querySelector('[data-action="new-journal"]')?.addEventListener('click', () => handlers.onNewPage('journal'))
   container.querySelector('[data-action="auth"]')?.addEventListener('click', handlers.onOpenAuth)
   container.querySelector('[data-action="sign-out"]')?.addEventListener('click', () => handlers.onSignOut?.())
+}
+
+function pageSection({ kind, label }, pages, activePageId, activeView) {
+  const items = pages.filter((p) => (p.kind ?? 'note') === kind)
+  if (!items.length) return ''
+  return `
+    <div class="sw-page-group">
+      <p class="sw-page-group-label">${label}</p>
+      <div class="sw-notes-list">
+        ${items.map(pageRow(activePageId, activeView)).join('')}
+      </div>
+    </div>`
 }
 
 function pageRow(activePageId, activeView) {
@@ -109,7 +133,7 @@ function pageRow(activePageId, activeView) {
       <span class="sw-note-icon">${page.icon || '📄'}</span>
       <span class="sw-note-text">
         <span class="sw-note-title">${escape(page.title)}</span>
-        ${page.course ? `<span class="sw-note-course">${escape(page.course.split(' — ')[0])}</span>` : ''}
+        ${page.kind === 'note' && page.course ? `<span class="sw-note-course">${escape(page.course)}</span>` : ''}
       </span>
     </button>`
 }

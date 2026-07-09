@@ -26,7 +26,7 @@ export function renderFlashcards(container, {
           <button type="button" class="flashcards-back" data-action="back">← Back</button>
           <div>
             <h1 class="flashcards-title">Flashcards</h1>
-            <p class="flashcards-subtitle">Epic 7 — generate from notes, review with spaced repetition</p>
+            <p class="flashcards-subtitle">Study from your notes with spaced repetition</p>
           </div>
         </header>
 

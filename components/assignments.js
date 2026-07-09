@@ -14,7 +14,7 @@ export function renderAssignments(container, { assignments, onBack, onAdd, onMov
         <button type="button" class="ws-back" data-action="back">← Dashboard</button>
         <div>
           <h1 class="ws-title">Assignments</h1>
-          <p class="ws-lead">User story: <strong>Track progress</strong> — move cards across the Kanban board as you work.</p>
+          <p class="ws-lead">Drag cards between columns as you work through each assignment.</p>
         </div>
       </header>
 

@@ -1,4 +1,4 @@
-/** Your semester courses — used in notes, assignments, flashcards */
+// Parth — list of our semester courses (used in editor dropdown + assignments)
 export const COURSES = [
   'xml/Js',
   'sqlServer',
